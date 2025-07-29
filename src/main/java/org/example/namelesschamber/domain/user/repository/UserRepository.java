@@ -1,6 +1,6 @@
 package org.example.namelesschamber.domain.user.repository;
 
-import org.example.namelesschamber.domain.user.model.User;
+import org.example.namelesschamber.domain.user.entity.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
