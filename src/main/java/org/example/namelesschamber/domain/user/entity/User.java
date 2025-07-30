@@ -21,10 +21,11 @@ public class User {
     @Indexed(unique = true)
     private String nickname;
 
+    private UserStatus status;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     private LocalDateTime lastLoginAt;
 
-    private UserStatus status;
 }
