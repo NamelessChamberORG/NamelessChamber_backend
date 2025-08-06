@@ -28,6 +28,8 @@ public class Post {
     @Indexed
     private String userId;
 
+    private PostType type;
+
     private boolean isDeleted;
     @CreatedDate
     private LocalDateTime createdAt;
