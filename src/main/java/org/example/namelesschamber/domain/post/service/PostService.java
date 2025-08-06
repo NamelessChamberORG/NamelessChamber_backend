@@ -2,6 +2,7 @@ package org.example.namelesschamber.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
+import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostResponseDto;
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
@@ -23,4 +24,17 @@ public class PostService {
 
         return PostResponseDto.from(post);
     }
+
+    public void createPost(PostCreateRequestDto request, String anonymousToken) {
+        Post post = Post.builder()
+                .content(request.content())
+                .type(request.type())
+                .anonymousToken(anonymousToken)
+                .isDeleted(false)
+                .build();
+
+        postRepository.save(post);
+    }
+
+
 }
