@@ -22,7 +22,7 @@ public class RandomPostFinder {
 
         AggregationResults<Post> result = mongoTemplate.aggregate(
                 aggregation,
-                "posts",
+                Post.class,
                 Post.class
         );
 

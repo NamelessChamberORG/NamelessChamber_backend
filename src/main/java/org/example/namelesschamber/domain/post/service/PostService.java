@@ -17,7 +17,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final RandomPostFinder randomPostFinder;
 
-    public PostResponseDto getPost(User user) {
+    public PostResponseDto getPost() {
 
         Post post = randomPostFinder.find()
                 .orElseThrow(() -> new CustomException("게시글이 없습니다."));

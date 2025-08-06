@@ -19,9 +19,9 @@ public class PostController {
 
     @Operation(summary = "글 조회", description = "저장된 게시글 중 무작위로 하나를 조회합니다.")
     @GetMapping("/posts")
-    public ApiResponse<PostResponseDto> getPost(User user){
+    public ApiResponse<PostResponseDto> getPost(){
 
-        PostResponseDto response = postService.getPost(user);
+        PostResponseDto response = postService.getPost();
 
         return ApiResponse.success(response);
     }
