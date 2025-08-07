@@ -7,7 +7,6 @@ import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostResponseDto;
 import org.example.namelesschamber.domain.post.service.PostService;
-import org.example.namelesschamber.domain.user.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,10 +26,10 @@ public class PostController {
     }
     @Operation(summary = "글 작성", description = "익명 사용자가 새로운 게시글을 작성합니다.")
     @PostMapping("/posts")
+    @ResponseStatus(HttpStatus.CREATED)
     public void createPost(@RequestBody @Valid PostCreateRequestDto request,
-                           @CookieValue("anonymousToken") String anonymousToken) {
+                           @CookieValue(value = "anonymousToken", required = false) String anonymousToken) {
         postService.createPost(request, anonymousToken);
     }
-
 
 }
