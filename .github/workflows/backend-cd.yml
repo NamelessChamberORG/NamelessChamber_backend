@@ -80,6 +80,7 @@ jobs:
             YAML
 
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+            docker compose down || true
             docker compose pull
             docker compose up -d
             docker image prune -f
