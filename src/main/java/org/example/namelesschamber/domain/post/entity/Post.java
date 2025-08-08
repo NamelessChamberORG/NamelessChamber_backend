@@ -1,4 +1,4 @@
-package org.example.namelesschamber.domain.user.entity;
+package org.example.namelesschamber.domain.post.entity;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -8,24 +8,30 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
-@Document(collection = "users")
+@Document(collection = "posts")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User {
+@ToString(exclude = "content")
+@EqualsAndHashCode(of = "id")
+public class Post {
 
     @Id
     private String id;
 
-    @Indexed(unique = true)
-    private String nickname;
+    private String content;
+    //비회원 사용자 식별용 UUID
+    @Indexed
+    private String anonymousToken;
+    //멤버 식별용 ID
+    @Indexed
+    private String userId;
 
-    private UserStatus status;
+    private PostType type;
 
+    private boolean isDeleted;
     @CreatedDate
     private LocalDateTime createdAt;
-
-    private LocalDateTime lastLoginAt;
 
 }
