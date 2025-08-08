@@ -62,12 +62,11 @@ jobs:
             set -e
             mkdir -p $APP_DIR
             cd $APP_DIR
-
+          
             cat > .env << 'EOF'
             MONGODB_URI=${{ secrets.MONGODB_URI }}
             EOF
-
-            # docker-compose.yml 작성
+          
             cat > docker-compose.yml << 'YAML'
             services:
               api:
@@ -77,10 +76,14 @@ jobs:
                   - "${EXPOSE_PORT}:8080"
                 env_file:
                   - .env
+                environment:
+                  - SPRING_PROFILES_ACTIVE=prod
+                  - TZ=Asia/Seoul
                 restart: unless-stopped
             YAML
-
+          
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GHCR_TOKEN }}
+            docker compose config
             docker compose down || true
             docker compose pull
             docker compose up -d
