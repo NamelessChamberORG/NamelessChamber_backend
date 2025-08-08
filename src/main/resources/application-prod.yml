@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: warn
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+    tryItOutEnabled: false
+    supportedSubmitMethods: []
