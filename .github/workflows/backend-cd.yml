@@ -33,6 +33,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
           tags: ${{ vars.IMAGE }}
           cache-from: type=registry,ref=${{ vars.IMAGE }}
@@ -59,15 +60,14 @@ jobs:
           envs: APP_DIR,EXPOSE_PORT,IMAGE
           script: |
             set -e
-
             mkdir -p $APP_DIR
             cd $APP_DIR
 
-            # 필요한 환경변수 작성 필요
             cat > .env << 'EOF'
             MONGODB_URI=${{ secrets.MONGODB_URI }}
             EOF
 
+            # docker-compose.yml 작성
             cat > docker-compose.yml << 'YAML'
             services:
               api:
