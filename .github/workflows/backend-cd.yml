@@ -56,6 +56,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.KEY }}
+          envs: APP_DIR,EXPOSE_PORT,IMAGE
           script: |
             set -e
 
