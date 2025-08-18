@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
@@ -10,8 +11,10 @@ import org.example.namelesschamber.domain.post.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "Posts", description = "게시글 API")
 public class PostController {
 
     private final PostService postService;

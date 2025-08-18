@@ -6,6 +6,8 @@ import org.example.namelesschamber.domain.post.entity.PostType;
 
 public record PostCreateRequestDto(
         @NotBlank
+        String title,
+        @NotBlank
         String content,
         @NotNull
         PostType type

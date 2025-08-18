@@ -1,0 +1,28 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  mvc:
+    log-request-details: true
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+
+logging:
+  level:
+    root: info
+    org.springframework.web: debug
+    org.springframework.data.mongodb.core.MongoTemplate: debug
+    org.springframework.data.mongodb.core.index: info
+    org.springframework.security: info
+    org.mongodb.driver: warn
+    com.mongodb.connection: warn
+    javax.management: warn
+    sun.rmi: warn
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+    tryItOutEnabled: true

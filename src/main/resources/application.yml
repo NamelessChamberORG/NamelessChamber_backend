@@ -1,4 +1,12 @@
+server:
+  servlet:
+    context-path: /api
+
 spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+
+logging:
+  level:
+    root: info
