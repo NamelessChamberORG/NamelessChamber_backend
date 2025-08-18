@@ -20,6 +20,8 @@ public class Post {
     @Id
     private String id;
 
+    private String title;
+
     private String content;
     //비회원 사용자 식별용 UUID
     @Indexed
@@ -30,7 +32,15 @@ public class Post {
 
     private PostType type;
 
-    private boolean isDeleted;
+    @Builder.Default
+    private boolean isDeleted = false;
+
+    @Builder.Default
+    private long views = 0L;
+
+    @Builder.Default
+    private long likes = 0L;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
