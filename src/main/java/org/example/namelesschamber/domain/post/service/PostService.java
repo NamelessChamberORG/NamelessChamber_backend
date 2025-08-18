@@ -31,7 +31,6 @@ public class PostService {
                 .content(request.content())
                 .type(request.type())
                 .anonymousToken(anonymousToken)
-                .isDeleted(false)
                 .build();
 
         postRepository.save(post);

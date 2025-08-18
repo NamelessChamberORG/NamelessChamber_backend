@@ -31,9 +31,12 @@ public class Post {
     private String userId;
 
     private PostType type;
-
-    private boolean isDeleted;
-
+    @Builder.Default
+    private boolean isDeleted = false;
+    @Builder.Default
+    private long views = 0L;
+    @Builder.Default
+    private long likes = 0L;
     @CreatedDate
     private LocalDateTime createdAt;
 
