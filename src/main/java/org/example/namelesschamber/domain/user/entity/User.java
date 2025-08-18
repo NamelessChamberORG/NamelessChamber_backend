@@ -21,6 +21,8 @@ public class User {
     @Indexed(unique = true)
     private String nickname;
 
+    private int coin;
+
     private UserStatus status;
 
     @CreatedDate

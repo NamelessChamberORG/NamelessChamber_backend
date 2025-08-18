@@ -20,6 +20,8 @@ public class Post {
     @Id
     private String id;
 
+    private String title;
+
     private String content;
     //비회원 사용자 식별용 UUID
     @Indexed
@@ -31,6 +33,7 @@ public class Post {
     private PostType type;
 
     private boolean isDeleted;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

@@ -27,6 +27,7 @@ public class PostService {
 
     public void createPost(PostCreateRequestDto request, String anonymousToken) {
         Post post = Post.builder()
+                .title(request.title())
                 .content(request.content())
                 .type(request.type())
                 .anonymousToken(anonymousToken)
