@@ -13,11 +13,14 @@ public record PostPreviewResponseDto(
         long views,
         LocalDateTime createdAt
 ) {
+    private static final int PREVIEW_MAX_LENGTH = 100;
+    private static final String ELLIPSIS = "...";
+
     public static PostPreviewResponseDto from(Post post) {
         String content = post.getContent() == null ? "" : post.getContent();
 
-        String preview = content.length() > 100
-                ? content.substring(0, 100) + "..."
+        String preview = content.length() > PREVIEW_MAX_LENGTH
+                ? content.substring(0, PREVIEW_MAX_LENGTH) + ELLIPSIS
                 : content;
 
         return new PostPreviewResponseDto(

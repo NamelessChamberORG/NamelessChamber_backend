@@ -32,7 +32,7 @@ public class PostController {
 
     @Operation(summary = "글 조회", description = "모든 게시물의 미리보기 리스트를 반환합니다.")
     @GetMapping("/posts")
-    public ApiResponse<List<PostPreviewResponseDto>> getPost(){
+    public ApiResponse<List<PostPreviewResponseDto>> getPosts(){
 
         List<PostPreviewResponseDto> response = postService.getPostPreviews();
 
