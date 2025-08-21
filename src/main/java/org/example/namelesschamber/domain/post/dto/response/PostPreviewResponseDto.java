@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 
 public record PostPreviewResponseDto(
         String id,
+        String userId,
         String title,
         String contentPreview,
         int contentLength,
@@ -25,6 +26,7 @@ public record PostPreviewResponseDto(
 
         return new PostPreviewResponseDto(
                 post.getId(),
+                post.getUserId(),
                 post.getTitle(),
                 preview,
                 content.length(),
