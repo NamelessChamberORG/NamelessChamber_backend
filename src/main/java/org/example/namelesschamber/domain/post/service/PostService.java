@@ -28,7 +28,7 @@ public class PostService {
 //    }
 
     public List<PostPreviewResponseDto> getPostPreviews() {
-        return postRepository.findAll().stream()
+        return postRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(PostPreviewResponseDto::from)
                 .toList();
     }
