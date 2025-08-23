@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
+import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
 import org.example.namelesschamber.domain.post.service.PostService;
 import org.springframework.http.HttpStatus;
@@ -45,5 +46,13 @@ public class PostController {
                            @CookieValue(value = "anonymousToken", required = false) String anonymousToken) {
         postService.createPost(request, anonymousToken);
     }
+
+    @Operation(summary = "특정 글 조회", description = "게시글 ID로 특정 게시글의 상세 내용을 조회합니다.")
+    @GetMapping("/posts/{id}")
+    public ApiResponse<PostDetailResponseDto> getPostById(@PathVariable String id) {
+        PostDetailResponseDto response = postService.getPostById(id);
+        return ApiResponse.success(response);
+    }
+
 
 }

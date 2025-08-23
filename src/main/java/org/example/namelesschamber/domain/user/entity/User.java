@@ -18,7 +18,7 @@ public class User {
     @Id
     private String id;
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, sparse = true)
     private String nickname;
 
     private int coin;
@@ -29,5 +29,10 @@ public class User {
     private LocalDateTime createdAt;
 
     private LocalDateTime lastLoginAt;
+
+    private boolean anonymous;
+
+    @Indexed(unique = true, sparse = true)
+    private String anonymousToken;
 
 }
