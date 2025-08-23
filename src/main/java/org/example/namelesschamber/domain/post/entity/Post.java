@@ -44,4 +44,10 @@ public class Post {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    public void increaseViews() {
+        this.views += 1;
+    }
 }
+
+
+
