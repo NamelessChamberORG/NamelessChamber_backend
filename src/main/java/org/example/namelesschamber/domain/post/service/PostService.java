@@ -45,9 +45,9 @@ public class PostService {
 
     public PostDetailResponseDto getPostById(String id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException(id));
+                .orElseThrow(() -> new PostNotFoundException());
 
-//        post.increaseViews();
+        post.increaseViews();
         postRepository.save(post);
 
         return PostDetailResponseDto.from(post);
