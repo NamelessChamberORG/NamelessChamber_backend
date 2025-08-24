@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .orElse("잘못된 요청입니다.");
+                .orElse(ErrorCode.INVALID_INPUT.getMessage());
 
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT.getStatus())
