@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.namelesschamber.common.exception.PostContentTooShortException;
 import org.example.namelesschamber.common.exception.PostNotFoundException;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
@@ -33,6 +34,11 @@ public class PostService {
                 .toList();
     }
     public void createPost(PostCreateRequestDto request, String anonymousToken) {
+
+        if (request.content().length() < 100) {
+            throw new PostContentTooShortException();
+        }
+
         Post post = Post.builder()
                 .title(request.title())
                 .content(request.content())
