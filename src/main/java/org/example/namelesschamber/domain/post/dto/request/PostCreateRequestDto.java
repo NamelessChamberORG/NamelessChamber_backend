@@ -9,7 +9,7 @@ public record PostCreateRequestDto(
         @NotBlank
         String title,
         @NotBlank
-        @Size(min = 100, message = "조금 더 이야기해주세요. 100자 이상 적어야 흘려보낼 수 있어요.")
+        @Size(min = 30, message = "조금 더 이야기해주세요. 30자 이상 적어야 흘려보낼 수 있어요.")
         String content,
         @NotNull
         PostType type
