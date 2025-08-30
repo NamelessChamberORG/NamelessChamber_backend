@@ -2,6 +2,7 @@ package org.example.namelesschamber.domain.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
@@ -22,14 +23,14 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "닉네임과 비밀번호를 입력받아 회원가입을 수행합니다. 성공 시 회원 정보와 토큰을 반환합니다.")
     @PostMapping("/signup")
-    public ResponseEntity<LoginResponseDto> signup(@RequestBody SignupRequestDto request) {
+    public ResponseEntity<LoginResponseDto> signup(@Valid @RequestBody SignupRequestDto request) {
         LoginResponseDto response = userService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "로그인", description = "닉네임과 비밀번호를 입력받아 로그인합니다. 성공 시 회원 정보와 토큰을 반환합니다.")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
+    public ResponseEntity<LoginResponseDto> login(@Valid @RequestBody LoginRequestDto request) {
         LoginResponseDto response = userService.login(request);
         return ResponseEntity.ok(response);
     }

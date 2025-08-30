@@ -7,6 +7,4 @@ public record SignupRequestDto(
         String nickname,
         @NotBlank
         String password
-) {
-
-}
+) {}
