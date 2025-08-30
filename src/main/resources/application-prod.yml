@@ -8,7 +8,14 @@ logging:
     root: warn
 
 springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger
-    tryItOutEnabled: false
-    supportedSubmitMethods: []
+    tryItOutEnabled: true
+    supportedSubmitMethods: [get, post, put, delete, patch]
+    display-request-duration: true
+
+server:
+  forward-headers-strategy: framework
