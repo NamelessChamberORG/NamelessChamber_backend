@@ -10,6 +10,7 @@ import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final EncoderUtils encoderUtils;
 
+    @Transactional
     public LoginResponseDto signup(SignupRequestDto request) {
         if (userRepository.existsByNickname(request.nickname())) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
@@ -33,6 +35,7 @@ public class UserService {
         return LoginResponseDto.of(user,null,null);
     }
 
+    @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByNickname(request.nickname())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
