@@ -21,9 +21,13 @@ public class User {
     @Indexed(unique = true, sparse = true)
     private String nickname;
 
-    private int coin;
+    private String passwordHash;
 
-    private UserStatus status;
+    @Builder.Default
+    private int coin = 0;
+
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVE;
 
     @CreatedDate
     private LocalDateTime createdAt;
