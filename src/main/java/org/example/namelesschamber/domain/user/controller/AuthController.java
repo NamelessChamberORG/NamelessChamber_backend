@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
-import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
