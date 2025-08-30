@@ -1,7 +1,8 @@
 package org.example.namelesschamber.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.namelesschamber.common.exception.PostNotFoundException;
+import org.example.namelesschamber.common.exception.CustomException;
+import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
@@ -36,7 +37,7 @@ public class PostService {
 
     public PostDetailResponseDto getPostById(String id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.increaseViews();
         postRepository.save(post);
