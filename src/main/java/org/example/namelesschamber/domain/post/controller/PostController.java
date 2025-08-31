@@ -32,17 +32,15 @@ public class PostController {
 //        return ApiResponse.success(response);
 //    }
 
-    @Operation(summary = "글 조회", description = "모든 게시물의 미리보기 리스트를 반환합니다.")
-    @GetMapping(value = "/posts", params = "!type")
-    public ApiResponse<List<PostPreviewResponseDto>> getPosts() {
-        List<PostPreviewResponseDto> response = postService.getPostPreviews();
-        return ApiResponse.success(response);
-    }
-
-    @Operation(summary = "글 조회 (타입별)", description = "타입에 따른 게시물의 미리보기 리스트를 반환합니다.")
-    @GetMapping(value = "/posts", params = "type")
-    public ApiResponse<List<PostPreviewResponseDto>> getPosts(@RequestParam PostType type) {
-        List<PostPreviewResponseDto> response = postService.getPostPreviews(type);
+    @Operation(summary = "글 조회", description = "게시물의 미리보기 리스트를 반환합니다. 'type' 쿼리 파라미터로 특정 타입의 글만 조회할 수 있습니다.")
+    @GetMapping("/posts")
+    public ApiResponse<List<PostPreviewResponseDto>> getPosts(@RequestParam(required = false) PostType type) {
+        List<PostPreviewResponseDto> response;
+        if (type == null) {
+            response = postService.getPostPreviews();
+        } else {
+            response = postService.getPostPreviews(type);
+        }
         return ApiResponse.success(response);
     }
 
