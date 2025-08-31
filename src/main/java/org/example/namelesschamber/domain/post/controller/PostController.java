@@ -8,6 +8,7 @@ import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
+import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -31,14 +32,18 @@ public class PostController {
 //        return ApiResponse.success(response);
 //    }
 
-    @Operation(summary = "글 조회", description = "모든 게시물의 미리보기 리스트를 반환합니다.")
+    @Operation(summary = "글 조회", description = "게시물의 미리보기 리스트를 반환합니다. 'type' 쿼리 파라미터로 특정 타입의 글만 조회할 수 있습니다.")
     @GetMapping("/posts")
-    public ApiResponse<List<PostPreviewResponseDto>> getPosts(){
-
-        List<PostPreviewResponseDto> response = postService.getPostPreviews();
-
+    public ApiResponse<List<PostPreviewResponseDto>> getPosts(@RequestParam(required = false) PostType type) {
+        List<PostPreviewResponseDto> response;
+        if (type == null) {
+            response = postService.getPostPreviews();
+        } else {
+            response = postService.getPostPreviews(type);
+        }
         return ApiResponse.success(response);
     }
+
     @Operation(summary = "글 작성", description = "익명 사용자가 새로운 게시글을 작성합니다.")
     @PostMapping("/posts")
     @ResponseStatus(HttpStatus.CREATED)

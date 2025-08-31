@@ -7,6 +7,7 @@ import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
 import org.example.namelesschamber.domain.post.entity.Post;
+import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,13 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostPreviewResponseDto> getPostPreviews() {
         return postRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(PostPreviewResponseDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostPreviewResponseDto> getPostPreviews(PostType type) {
+        return postRepository.findAllByTypeOrderByCreatedAtDesc(type).stream()
                 .map(PostPreviewResponseDto::from)
                 .toList();
     }
