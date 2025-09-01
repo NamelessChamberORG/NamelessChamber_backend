@@ -36,6 +36,8 @@ public class PostService {
 
     @Transactional
     public void createPost(PostCreateRequestDto request, String anonymousToken) {
+        request.type().validateContentLength(request.content());
+
         Post post = Post.builder()
                 .title(request.title())
                 .content(request.content())

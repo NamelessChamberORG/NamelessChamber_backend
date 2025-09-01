@@ -34,9 +34,4 @@ public class User {
 
     private LocalDateTime lastLoginAt;
 
-    private boolean anonymous;
-
-    @Indexed(unique = true, sparse = true)
-    private String anonymousToken;
-
 }
