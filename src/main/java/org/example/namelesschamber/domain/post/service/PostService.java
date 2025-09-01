@@ -36,6 +36,16 @@ public class PostService {
 
     @Transactional
     public void createPost(PostCreateRequestDto request, String anonymousToken) {
+        int length = request.content().length();
+
+        if (request.type() == PostType.SHORT && length < 30) {
+            throw new CustomException(ErrorCode.CONTENT_TOO_SHORT_FOR_SHORT);
+        }
+
+        if (request.type() == PostType.LONG && length < 100) {
+            throw new CustomException(ErrorCode.CONTENT_TOO_SHORT_FOR_LONG);
+        }
+
         Post post = Post.builder()
                 .title(request.title())
                 .content(request.content())

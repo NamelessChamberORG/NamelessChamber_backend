@@ -13,7 +13,9 @@ public enum ErrorCode {
     POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST,  "이미 삭제된 게시글입니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST, "이미 사용 중인 닉네임입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
-    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 올바르지 않습니다.");
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 올바르지 않습니다."),
+    CONTENT_TOO_SHORT_FOR_SHORT(HttpStatus.BAD_REQUEST, "조금 더 이야기해주세요. 30자 이상 적어야 흘려보낼 수 있어요."),
+    CONTENT_TOO_SHORT_FOR_LONG(HttpStatus.BAD_REQUEST, "조금 더 이야기해주세요. 100자 이상 적어야 흘려보낼 수 있어요.");
 
     private final HttpStatus status;
     private final String message;
