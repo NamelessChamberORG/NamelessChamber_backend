@@ -18,6 +18,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 @Profile("prod")
 public class SwaggerSecurityConfig {
 
+    private static final String SWAGGER_ROLE = "ADMIN";
+
     @Bean
     public UserDetailsService swaggerUserDetailsService(
             @Value("${swagger.username}") String username,
@@ -27,7 +29,7 @@ public class SwaggerSecurityConfig {
         UserDetails swaggerUser = User.builder()
                 .username(username)
                 .password(encoder.encode(password))
-                .roles("DEV")
+                .roles(SWAGGER_ROLE)
                 .build();
 
         return new InMemoryUserDetailsManager(swaggerUser);
@@ -39,7 +41,7 @@ public class SwaggerSecurityConfig {
                 .securityMatcher("/swagger-ui/**", "/v3/api-docs/**", "/swagger") // Swagger 경로에만 적용
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasRole("DEV")
+                        .anyRequest().hasRole(SWAGGER_ROLE)
                 )
                 .httpBasic(Customizer.withDefaults());
 
