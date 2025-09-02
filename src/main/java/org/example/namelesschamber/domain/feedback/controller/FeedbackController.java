@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.domain.feedback.dto.request.FeedbackRequestDto;
-import org.example.namelesschamber.domain.feedback.entity.Feedback;
+import org.example.namelesschamber.domain.feedback.dto.response.FeedbackResponseDto;
 import org.example.namelesschamber.domain.feedback.service.FeedbackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +34,8 @@ public class FeedbackController {
 
     @Operation(summary = "피드백 조회", description = "저장된 피드백 리스트를 조회합니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Feedback>>> getAllFeedbacks() {
-        List<Feedback> feedbacks = feedbackService.getAllFeedbacks();
-        return ApiResponse.success(HttpStatus.OK, feedbacks);
+    public ResponseEntity<ApiResponse<List<FeedbackResponseDto>>> getAllFeedbacks() {
+        List<FeedbackResponseDto> response = feedbackService.getAllFeedbacks();
+        return ApiResponse.success(HttpStatus.OK, response);
     }
 }

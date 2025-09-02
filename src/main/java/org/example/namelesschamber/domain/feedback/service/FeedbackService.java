@@ -2,6 +2,7 @@ package org.example.namelesschamber.domain.feedback.service;
 
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.domain.feedback.dto.request.FeedbackRequestDto;
+import org.example.namelesschamber.domain.feedback.dto.response.FeedbackResponseDto;
 import org.example.namelesschamber.domain.feedback.entity.Feedback;
 import org.example.namelesschamber.domain.feedback.repository.FeedbackRepository;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class FeedbackService {
     }
 
     @Transactional(readOnly = true)
-    public List<Feedback> getAllFeedbacks() {
-        return feedbackRepository.findAll();
+    public List<FeedbackResponseDto> getAllFeedbacks() {
+        return feedbackRepository.findAll().stream().map(FeedbackResponseDto::from).toList();
     }
 }

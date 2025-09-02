@@ -19,7 +19,7 @@ public class Feedback {
     private String content;
 
     @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 
     public static Feedback create(String userId, String content) {
         return Feedback.builder()
