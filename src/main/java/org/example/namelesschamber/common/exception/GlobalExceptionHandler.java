@@ -17,19 +17,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleCustomException(CustomException ex) {
         ErrorCode errorCode = ex.getErrorCode();
 
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ApiResponse.error(errorCode.getStatus().value(),
-                        errorCode.getMessage()));
+        return ApiResponse.error(
+                errorCode.getStatus(),
+                errorCode.getCode(),
+                errorCode.getMessage()
+        );
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        ErrorCode.INTERNAL_SERVER_ERROR.getMessage()));
+        return ApiResponse.error(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
+                ErrorCode.INTERNAL_SERVER_ERROR.getMessage()
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -40,11 +41,10 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse(ErrorCode.INVALID_INPUT.getMessage());
 
-        return ResponseEntity
-                .status(ErrorCode.INVALID_INPUT.getStatus())
-                .body(ApiResponse.error(
-                        ErrorCode.INVALID_INPUT.getStatus().value(),
-                        errorMessage
-                ));
+        return ApiResponse.error(
+                ErrorCode.INVALID_INPUT.getStatus(),
+                ErrorCode.INVALID_INPUT.getCode(),
+                errorMessage
+        );
     }
 }
