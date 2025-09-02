@@ -19,7 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 public class SwaggerSecurityConfig {
 
     @Bean
-    public UserDetailsService swaggerUsers(
+    public UserDetailsService swaggerUserDetailsService(
             @Value("${swagger.username}") String username,
             @Value("${swagger.password}") String password,
             PasswordEncoder encoder
@@ -36,12 +36,12 @@ public class SwaggerSecurityConfig {
     @Bean
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         http
-                .securityMatcher("/swagger-ui/**", "/v3/api-docs/**", "/swagger/**") // Swagger 경로에만 적용
+                .securityMatcher("/swagger-ui/**", "/v3/api-docs/**", "/swagger") // Swagger 경로에만 적용
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().hasRole("DEV")
                 )
-                .formLogin(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
