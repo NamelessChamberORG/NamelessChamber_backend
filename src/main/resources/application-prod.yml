@@ -17,5 +17,9 @@ springdoc:
     supportedSubmitMethods: [get, post, put, delete, patch]
     display-request-duration: true
 
+swagger:
+  username: ${SWAGGER_USERNAME}
+  password: ${SWAGGER_PASSWORD}
+
 server:
   forward-headers-strategy: framework
