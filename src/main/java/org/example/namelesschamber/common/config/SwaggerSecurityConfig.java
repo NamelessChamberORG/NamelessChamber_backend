@@ -36,12 +36,13 @@ public class SwaggerSecurityConfig {
     @Bean
     public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
         http
+                .securityMatcher("/swagger-ui/**", "/v3/api-docs/**", "/swagger/**") // Swagger 경로에만 적용
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger/**").hasRole("DEV")
-                        .anyRequest().permitAll()
+                        .anyRequest().hasRole("DEV")
                 )
                 .formLogin(Customizer.withDefaults());
-                return http.build();
+
+        return http.build();
     }
 }
