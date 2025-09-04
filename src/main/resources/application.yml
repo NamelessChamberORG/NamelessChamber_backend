@@ -3,7 +3,7 @@ server:
     context-path: /api
 
 jwt:
-  secret: your-very-secret-key-your-very-secret-key
+  secret: ${JWT_SECRET}
   expiration: 3600000
 
 spring:
