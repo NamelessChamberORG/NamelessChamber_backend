@@ -13,6 +13,8 @@ import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -34,7 +36,8 @@ public class UserService {
 
         userRepository.save(user);
 
-        return LoginResponseDto.of(user,null,null);
+        String accessToken = jwtTokenProvider.createToken(user.getId(), "USER");
+        return LoginResponseDto.of(user, accessToken, null);
     }
 
     @Transactional(readOnly = true)
@@ -46,8 +49,17 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        String accessToken = jwtTokenProvider.createToken(user.getId());
+        String accessToken = jwtTokenProvider.createToken(user.getId(), "USER");
         return LoginResponseDto.of(user, accessToken, null);
+    }
+
+
+    @Transactional
+    public LoginResponseDto loginAsAnonymous() {
+        String uuid = UUID.randomUUID().toString();
+        String accessToken = jwtTokenProvider.createToken(uuid, "ANONYMOUS");
+
+        return LoginResponseDto.anonymous(uuid, accessToken);
     }
 
 }

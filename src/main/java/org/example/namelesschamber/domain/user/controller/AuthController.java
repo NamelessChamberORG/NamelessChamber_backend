@@ -38,4 +38,14 @@ public class AuthController {
         return ApiResponse.success(HttpStatus.OK, response);
     }
 
+    @Operation(
+            summary = "익명 로그인",
+            description = "UUID 기반 익명 사용자로 로그인합니다. 회원이 아닌 경우에도 JWT 토큰을 발급받아 글쓰기 등 기능을 사용할 수 있습니다."
+    )
+    @PostMapping("/anonymous")
+    public ResponseEntity<ApiResponse<LoginResponseDto>> anonymousLogin() {
+        LoginResponseDto response = userService.loginAsAnonymous();
+        return ApiResponse.success(HttpStatus.OK, response);
+    }
+
 }

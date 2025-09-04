@@ -35,7 +35,7 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(PostCreateRequestDto request, String userId, String anonymousToken) {
+    public void createPost(PostCreateRequestDto request, String subject, String role) {
         request.type().validateContentLength(request.content());
 
         Post.PostBuilder builder = Post.builder()
@@ -43,14 +43,16 @@ public class PostService {
                 .content(request.content())
                 .type(request.type());
 
-        if (userId != null) {
-            builder.userId(userId);
+        if ("USER".equals(role)) {
+            builder.userId(subject);          // 회원이면 userId 저장
+        } else if ("ANONYMOUS".equals(role)) {
+            builder.anonymousToken(subject);  // 익명이면 uuid 저장
+        } else {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
         }
-        builder.anonymousToken(anonymousToken);
 
         postRepository.save(builder.build());
     }
-
 
 
     @Transactional

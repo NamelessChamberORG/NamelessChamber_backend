@@ -7,7 +7,8 @@ public record LoginResponseDto(
         String nickname,
         int coin,
         String accessToken,
-        String refreshToken
+        String refreshToken,
+        String role // USER / ANONYMOUS
 ) {
     public static LoginResponseDto of(User user, String accessToken, String refreshToken) {
         return new LoginResponseDto(
@@ -15,7 +16,19 @@ public record LoginResponseDto(
                 user.getNickname(),
                 user.getCoin(),
                 accessToken,
-                refreshToken
+                refreshToken,
+                "USER"
+        );
+    }
+
+    public static LoginResponseDto anonymous(String uuid, String accessToken) {
+        return new LoginResponseDto(
+                uuid,
+                "anonymous",
+                0,
+                accessToken,
+                null,
+                "ANONYMOUS"
         );
     }
 }

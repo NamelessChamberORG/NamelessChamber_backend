@@ -54,15 +54,15 @@ public class PostController {
     )
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<Void>> createPost(
-            @RequestBody @Valid PostCreateRequestDto request,
-            @Parameter(description = "익명 사용자 토큰 (비회원일 때 필요)")
-            @CookieValue(value = "anonymousToken", required = false) String anonymousToken) {
+            @RequestBody @Valid PostCreateRequestDto request) {
 
-        String userId = SecurityUtils.getCurrentUserId();
-        postService.createPost(request, userId, anonymousToken);
+        String subject = SecurityUtils.getCurrentSubject(); // userId or uuid
+        String role = SecurityUtils.getCurrentRole();       // USER or ANONYMOUS
 
+        postService.createPost(request, subject, role);
         return ApiResponse.success(HttpStatus.CREATED);
     }
+
     @Operation(summary = "특정 글 조회", description = "게시글 ID로 특정 게시글의 상세 내용을 조회합니다.")
     @GetMapping("/posts/{id}")
     public ResponseEntity<ApiResponse<PostDetailResponseDto>> getPostById(@PathVariable String id) {

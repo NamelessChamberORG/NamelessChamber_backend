@@ -1,5 +1,6 @@
 package org.example.namelesschamber.common.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +29,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.debug("Incoming token: {}", token);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String userId = jwtTokenProvider.getUserId(token);
-            log.debug("Authenticated userId: {}", userId);
+        if (token != null && jwtTokenProvider.isValid(token)) {
+            Claims claims = jwtTokenProvider.parseClaims(token);
+            String subject = claims.getSubject();
+            String role = claims.get("role", String.class);
+
+            log.debug("Authenticated subject: {}, role: {}", subject, role);
+
+            CustomPrincipal principal = new CustomPrincipal(subject, role);
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userId, null, List.of());
+                    new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
