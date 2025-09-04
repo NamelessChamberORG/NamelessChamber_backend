@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/feedbacks")
+@RequestMapping("/feedbacks")
 @Tag(name = "Feedbacks", description = "피드백 API")
 public class FeedbackController {
 
