@@ -20,7 +20,13 @@ public class JwtTokenProvider {
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration}") long validityInMs) {
 
-        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        //토큰 키 길이 검증
+        byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (secretBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret key is too short");
+        }
+
+        this.key = Keys.hmacShaKeyFor(secretBytes);
         this.validityInMs = validityInMs;
 
         // 시계 오차 허용(운영 권장): 60초
@@ -44,7 +50,7 @@ public class JwtTokenProvider {
                 .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiry)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .signWith(key)
                 .compact();
     }
 
