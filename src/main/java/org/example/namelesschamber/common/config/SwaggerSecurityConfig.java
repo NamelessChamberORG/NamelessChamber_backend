@@ -16,7 +16,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
 @Configuration
-@Profile("prod")
 public class SwaggerSecurityConfig {
 
     private static final String SWAGGER_ROLE = "ADMIN";
@@ -36,17 +35,4 @@ public class SwaggerSecurityConfig {
         return new InMemoryUserDetailsManager(swaggerUser);
     }
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/swagger-ui/**", "/v3/api-docs/**", "/swagger") // Swagger 경로에만 적용
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().hasRole(SWAGGER_ROLE)
-                )
-                .httpBasic(Customizer.withDefaults());
-
-        return http.build();
-    }
 }

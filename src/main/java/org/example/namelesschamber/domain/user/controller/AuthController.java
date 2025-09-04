@@ -13,10 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 @Tag(name = "Auth", description = "회원가입 및 로그인 API")
 public class AuthController {
 
@@ -33,6 +35,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto request) {
         LoginResponseDto response = userService.login(request);
+        return ApiResponse.success(HttpStatus.OK, response);
+    }
+
+    @Operation(
+            summary = "익명 로그인",
+            description = "UUID 기반 익명 사용자로 로그인합니다. 회원이 아닌 경우에도 JWT 토큰을 발급받아 글쓰기 등 기능을 사용할 수 있습니다."
+    )
+    @PostMapping("/anonymous")
+    public ResponseEntity<ApiResponse<LoginResponseDto>> anonymousLogin() {
+        LoginResponseDto response = userService.loginAsAnonymous();
         return ApiResponse.success(HttpStatus.OK, response);
     }
 

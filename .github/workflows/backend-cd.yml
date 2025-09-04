@@ -67,6 +67,7 @@ jobs:
             MONGODB_URI=${{ secrets.MONGODB_URI }}
             SWAGGER_USERNAME=${{ secrets.SWAGGER_USERNAME }}
             SWAGGER_PASSWORD=${{ secrets.SWAGGER_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
             EOF
           
             cat > docker-compose.yml << 'YAML'
