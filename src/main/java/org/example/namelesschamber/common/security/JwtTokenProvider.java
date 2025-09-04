@@ -63,13 +63,4 @@ public class JwtTokenProvider {
         }
     }
 
-    /** subject(userId | uuid) */
-    public String getSubject(String token) {
-        return parseClaims(token).getSubject();
-    }
-
-    /** role(USER | ANONYMOUS) */
-    public String getRole(String token) {
-        return parseClaims(token).get("role", String.class);
-    }
 }

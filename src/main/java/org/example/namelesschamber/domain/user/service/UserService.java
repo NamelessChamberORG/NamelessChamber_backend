@@ -9,6 +9,7 @@ import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.entity.User;
+import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        String accessToken = jwtTokenProvider.createToken(user.getId(), "USER");
+        String accessToken = jwtTokenProvider.createToken(user.getId(), UserRole.USER.name());
         return LoginResponseDto.of(user, accessToken, null);
     }
 
@@ -49,7 +50,7 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        String accessToken = jwtTokenProvider.createToken(user.getId(), "USER");
+        String accessToken = jwtTokenProvider.createToken(user.getId(), UserRole.USER.name());
         return LoginResponseDto.of(user, accessToken, null);
     }
 
@@ -57,7 +58,7 @@ public class UserService {
     @Transactional
     public LoginResponseDto loginAsAnonymous() {
         String uuid = UUID.randomUUID().toString();
-        String accessToken = jwtTokenProvider.createToken(uuid, "ANONYMOUS");
+        String accessToken = jwtTokenProvider.createToken(uuid, UserRole.ANONYMOUS.name());
 
         return LoginResponseDto.anonymous(uuid, accessToken);
     }

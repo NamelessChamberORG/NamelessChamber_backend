@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.user.dto.response;
 
 import org.example.namelesschamber.domain.user.entity.User;
+import org.example.namelesschamber.domain.user.entity.UserRole;
 
 public record LoginResponseDto(
         String id,
@@ -17,18 +18,18 @@ public record LoginResponseDto(
                 user.getCoin(),
                 accessToken,
                 refreshToken,
-                "USER"
+                UserRole.USER.name()
         );
     }
 
     public static LoginResponseDto anonymous(String uuid, String accessToken) {
         return new LoginResponseDto(
                 uuid,
-                "anonymous",
+                UserRole.ANONYMOUS.name().toLowerCase(),
                 0,
                 accessToken,
                 null,
-                "ANONYMOUS"
+                UserRole.ANONYMOUS.name()
         );
     }
 }
