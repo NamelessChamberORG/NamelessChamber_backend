@@ -9,6 +9,7 @@ import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseD
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
+import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,18 +36,25 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(PostCreateRequestDto request, String anonymousToken) {
+    public void createPost(PostCreateRequestDto request, String subject, String role) {
         request.type().validateContentLength(request.content());
 
-        Post post = Post.builder()
+        Post.PostBuilder builder = Post.builder()
                 .title(request.title())
                 .content(request.content())
-                .type(request.type())
-                .anonymousToken(anonymousToken)
-                .build();
+                .type(request.type());
 
-        postRepository.save(post);
+        if (UserRole.USER.name().equals(role)) {
+            builder.userId(subject);          // 회원이면 userId 저장
+        } else if (UserRole.ANONYMOUS.name().equals(role)) {
+            builder.anonymousToken(subject);  // 익명이면 uuid 저장
+        } else {
+            throw new CustomException(ErrorCode.INVALID_INPUT);
+        }
+
+        postRepository.save(builder.build());
     }
+
 
     @Transactional
     public PostDetailResponseDto getPostById(String id) {

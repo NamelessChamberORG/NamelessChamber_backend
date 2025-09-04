@@ -3,14 +3,18 @@ package org.example.namelesschamber.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
+import org.example.namelesschamber.common.security.JwtTokenProvider;
 import org.example.namelesschamber.common.util.EncoderUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.entity.User;
+import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final EncoderUtils encoderUtils;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public LoginResponseDto signup(SignupRequestDto request) {
@@ -32,7 +37,8 @@ public class UserService {
 
         userRepository.save(user);
 
-        return LoginResponseDto.of(user,null,null);
+        String accessToken = jwtTokenProvider.createToken(user.getId(), UserRole.USER.name());
+        return LoginResponseDto.of(user, accessToken, null);
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +50,17 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return LoginResponseDto.of(user, null, null);
+        String accessToken = jwtTokenProvider.createToken(user.getId(), UserRole.USER.name());
+        return LoginResponseDto.of(user, accessToken, null);
+    }
+
+
+    @Transactional
+    public LoginResponseDto loginAsAnonymous() {
+        String uuid = UUID.randomUUID().toString();
+        String accessToken = jwtTokenProvider.createToken(uuid, UserRole.ANONYMOUS.name());
+
+        return LoginResponseDto.anonymous(uuid, accessToken);
     }
 
 }

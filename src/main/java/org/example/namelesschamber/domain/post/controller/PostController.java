@@ -1,10 +1,13 @@
 package org.example.namelesschamber.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
+import org.example.namelesschamber.common.security.SecurityUtils;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
@@ -44,13 +47,19 @@ public class PostController {
         return ApiResponse.success(HttpStatus.OK, response);
     }
 
-    @Operation(summary = "글 작성", description = "새로운 게시글을 작성합니다.")
+    @Operation(
+            summary = "글 작성",
+            description = "새로운 게시글 작성",
+            security = @SecurityRequirement(name = "BearerAuth")
+    )
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<Void>> createPost(
-            @RequestBody @Valid PostCreateRequestDto request,
-            @CookieValue(value = "anonymousToken", required = false) String anonymousToken) {
+            @RequestBody @Valid PostCreateRequestDto request) {
 
-        postService.createPost(request, anonymousToken);
+        String subject = SecurityUtils.getCurrentSubject(); // userId or uuid
+        String role = SecurityUtils.getCurrentRole();       // USER or ANONYMOUS
+
+        postService.createPost(request, subject, role);
         return ApiResponse.success(HttpStatus.CREATED);
     }
 
