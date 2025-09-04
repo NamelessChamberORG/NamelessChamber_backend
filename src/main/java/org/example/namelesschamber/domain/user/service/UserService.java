@@ -26,12 +26,12 @@ public class UserService {
 
     @Transactional
     public LoginResponseDto signup(SignupRequestDto request) {
-        if (userRepository.existsByNickname(request.nickname())) {
-            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        if (userRepository.existsByEmail(request.email())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         User user = User.builder()
-                .nickname(request.nickname())
+                .email(request.email())
                 .passwordHash(encoderUtils.encode(request.password()))
                 .build();
 
@@ -43,7 +43,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto request) {
-        User user = userRepository.findByNickname(request.nickname())
+        User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         if (!encoderUtils.matches(request.password(), user.getPasswordHash())) {

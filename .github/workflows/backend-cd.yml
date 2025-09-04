@@ -68,6 +68,7 @@ jobs:
             SWAGGER_USERNAME=${{ secrets.SWAGGER_USERNAME }}
             SWAGGER_PASSWORD=${{ secrets.SWAGGER_PASSWORD }}
             JWT_SECRET=${{ secrets.JWT_SECRET }}
+            CORS_ALLOWED_ORIGINS=${{secrets.CORS_ALLOWED_ORIGINS}}
             EOF
           
             cat > docker-compose.yml << 'YAML'

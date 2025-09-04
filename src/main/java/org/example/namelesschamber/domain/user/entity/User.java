@@ -18,6 +18,8 @@ public class User {
     @Id
     private String id;
 
+    private String email;
+
     @Indexed(unique = true, sparse = true)
     private String nickname;
 

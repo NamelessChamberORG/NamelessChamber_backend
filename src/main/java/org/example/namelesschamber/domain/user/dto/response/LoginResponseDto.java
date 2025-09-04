@@ -5,6 +5,7 @@ import org.example.namelesschamber.domain.user.entity.UserRole;
 
 public record LoginResponseDto(
         String id,
+        String email,
         String nickname,
         int coin,
         String accessToken,
@@ -14,6 +15,7 @@ public record LoginResponseDto(
     public static LoginResponseDto of(User user, String accessToken, String refreshToken) {
         return new LoginResponseDto(
                 user.getId(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getCoin(),
                 accessToken,
@@ -26,6 +28,7 @@ public record LoginResponseDto(
         return new LoginResponseDto(
                 uuid,
                 UserRole.ANONYMOUS.name().toLowerCase(),
+                null,
                 0,
                 accessToken,
                 null,
