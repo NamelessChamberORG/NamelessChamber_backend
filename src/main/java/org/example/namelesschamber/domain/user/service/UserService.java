@@ -3,6 +3,7 @@ package org.example.namelesschamber.domain.user.service;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
+import org.example.namelesschamber.common.security.JwtTokenProvider;
 import org.example.namelesschamber.common.util.EncoderUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
@@ -18,6 +19,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final EncoderUtils encoderUtils;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public LoginResponseDto signup(SignupRequestDto request) {
@@ -44,7 +46,8 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return LoginResponseDto.of(user, null, null);
+        String accessToken = jwtTokenProvider.createToken(user.getId());
+        return LoginResponseDto.of(user, accessToken, null);
     }
 
 }

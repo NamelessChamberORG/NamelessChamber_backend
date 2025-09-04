@@ -35,18 +35,23 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(PostCreateRequestDto request, String anonymousToken) {
+    public void createPost(PostCreateRequestDto request, String userId, String anonymousToken) {
         request.type().validateContentLength(request.content());
 
-        Post post = Post.builder()
+        Post.PostBuilder builder = Post.builder()
                 .title(request.title())
                 .content(request.content())
-                .type(request.type())
-                .anonymousToken(anonymousToken)
-                .build();
+                .type(request.type());
 
-        postRepository.save(post);
+        if (userId != null) {
+            builder.userId(userId);
+        }
+        builder.anonymousToken(anonymousToken);
+
+        postRepository.save(builder.build());
     }
+
+
 
     @Transactional
     public PostDetailResponseDto getPostById(String id) {

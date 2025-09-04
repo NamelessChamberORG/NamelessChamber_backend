@@ -1,10 +1,13 @@
 package org.example.namelesschamber.domain.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
+import org.example.namelesschamber.common.security.SecurityUtils;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
@@ -44,16 +47,22 @@ public class PostController {
         return ApiResponse.success(HttpStatus.OK, response);
     }
 
-    @Operation(summary = "글 작성", description = "새로운 게시글을 작성합니다.")
+    @Operation(
+            summary = "글 작성",
+            description = "새로운 게시글 작성",
+            security = @SecurityRequirement(name = "BearerAuth")
+    )
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<Void>> createPost(
             @RequestBody @Valid PostCreateRequestDto request,
+            @Parameter(description = "익명 사용자 토큰 (비회원일 때 필요)")
             @CookieValue(value = "anonymousToken", required = false) String anonymousToken) {
 
-        postService.createPost(request, anonymousToken);
+        String userId = SecurityUtils.getCurrentUserId();
+        postService.createPost(request, userId, anonymousToken);
+
         return ApiResponse.success(HttpStatus.CREATED);
     }
-
     @Operation(summary = "특정 글 조회", description = "게시글 ID로 특정 게시글의 상세 내용을 조회합니다.")
     @GetMapping("/posts/{id}")
     public ResponseEntity<ApiResponse<PostDetailResponseDto>> getPostById(@PathVariable String id) {
