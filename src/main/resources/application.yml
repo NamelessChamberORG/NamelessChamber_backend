@@ -2,6 +2,10 @@ server:
   servlet:
     context-path: /api
 
+jwt:
+  secret: your-very-secret-key-your-very-secret-key
+  expiration: 3600000
+
 spring:
   data:
     mongodb:
@@ -10,3 +14,7 @@ spring:
 logging:
   level:
     root: info
+
+swagger:
+  username: ${SWAGGER_USERNAME}
+  password: ${SWAGGER_PASSWORD}
