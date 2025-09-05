@@ -18,6 +18,7 @@ public class User {
     @Id
     private String id;
 
+    @Indexed(unique = true, sparse = true)
     private String email;
 
     @Indexed(unique = true, sparse = true)

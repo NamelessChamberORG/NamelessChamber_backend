@@ -92,7 +92,6 @@ public class UserService {
     public LoginResponseDto loginAsAnonymous() {
 
         User user = User.builder()
-                .email(UUID.randomUUID().toString()) // UUID로 email 필드 채움
                 .userRole(UserRole.ANONYMOUS)
                 .expiresAt(LocalDateTime.now().plusDays(7)) // 7일 TTL
                 .build();
