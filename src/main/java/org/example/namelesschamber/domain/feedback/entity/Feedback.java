@@ -14,16 +14,12 @@ public class Feedback {
     @Id
     private String id;
 
-    private String userId;
-
     private String content;
 
-    @Builder.Default
     private LocalDateTime createdAt;
 
-    public static Feedback create(String userId, String content) {
+    public static Feedback create(String content) {
         return Feedback.builder()
-                .userId(userId)
                 .content(content)
                 .createdAt(LocalDateTime.now())
                 .build();
