@@ -1,5 +1,6 @@
 package org.example.namelesschamber.common.config;
 
+import org.example.namelesschamber.domain.user.entity.User;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,7 +19,7 @@ public class MongoIndexConfig {
 
     @PostConstruct
     public void initIndexes() {
-        mongoTemplate.indexOps("users")
+        mongoTemplate.indexOps(User.class)
                 .ensureIndex(new Index()
                         .on("expiresAt", Sort.Direction.ASC)
                         .expire(0, TimeUnit.SECONDS));
