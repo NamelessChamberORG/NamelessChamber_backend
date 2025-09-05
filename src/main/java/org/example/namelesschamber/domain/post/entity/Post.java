@@ -23,9 +23,7 @@ public class Post {
     private String title;
 
     private String content;
-    //비회원 사용자 식별용 UUID
-    @Indexed
-    private String anonymousToken;
+
     //멤버 식별용 ID
     @Indexed
     private String userId;
