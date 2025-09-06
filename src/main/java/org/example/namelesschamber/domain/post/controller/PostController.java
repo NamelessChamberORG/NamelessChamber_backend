@@ -46,7 +46,7 @@ public class PostController {
     }
     @Operation(
             summary = "글 작성",
-            description = "새로운 게시글 작성을 작성합니다"
+            description = "새로운 게시글을 작성합니다"
     )
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<PostCreateResponseDto>> createPost(

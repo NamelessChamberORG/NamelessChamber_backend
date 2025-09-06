@@ -30,7 +30,6 @@ public class CoinService {
     @Transactional
     public int chargeForRead(String userId, int amount) {
         User user = findUserById(userId);
-        if (user.getCoin() < amount) throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
         user.decreaseCoin(amount);
         userRepository.save(user);
         return user.getCoin();
