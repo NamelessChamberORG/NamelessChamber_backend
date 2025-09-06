@@ -24,7 +24,7 @@ public class AuthController {
 
     @Operation(
             summary = "회원가입",
-            description = "닉네임과 비밀번호를 입력받아 회원가입을 수행합니다. 익명 사용자 토큰이 있으면 해당 계정을 회원으로 전환합니다."
+            description = "이메일과 비밀번호를 입력받아 회원가입을 수행합니다. 익명 사용자 토큰이 있으면 해당 계정을 회원으로 전환합니다."
     )
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<LoginResponseDto>> signup(
@@ -36,7 +36,7 @@ public class AuthController {
         return ApiResponse.success(HttpStatus.CREATED, response);
     }
 
-    @Operation(summary = "로그인", description = "닉네임과 비밀번호를 입력받아 로그인합니다. 성공 시 회원 정보와 토큰을 반환합니다.")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력받아 로그인합니다. 성공 시 회원 정보와 토큰을 반환합니다.")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto request) {
         LoginResponseDto response = userService.login(request);
@@ -45,7 +45,7 @@ public class AuthController {
 
     @Operation(
             summary = "익명 로그인",
-            description = "UUID 기반 익명 사용자로 로그인합니다. 회원이 아닌 경우에도 JWT 토큰을 발급받아 글쓰기 등 기능을 사용할 수 있습니다."
+            description = "익명 사용자로 로그인합니다. 회원이 아닌 경우에도 JWT 토큰을 발급받아 글쓰기 등 기능을 사용할 수 있습니다."
     )
     @PostMapping("/anonymous")
     public ResponseEntity<ApiResponse<LoginResponseDto>> anonymousLogin() {
