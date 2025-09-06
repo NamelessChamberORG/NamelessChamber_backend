@@ -18,7 +18,8 @@ public enum ErrorCode {
     CONTENT_TOO_SHORT_FOR_LONG(HttpStatus.BAD_REQUEST,1008, "조금 더 이야기해주세요. 100자 이상 적어야 흘려보낼 수 있어요."),
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST,1009, "이미 사용 중인 이메일입니다."),
     USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST,1010,"활성화된 계정이 아닙니다."),
-    NOT_ENOUGH_COIN(HttpStatus.BAD_REQUEST,1011,"가지고 있는 코인이 없습니다.");
+    NOT_ENOUGH_COIN(HttpStatus.BAD_REQUEST,1011,"가지고 있는 코인이 없습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,1012, "토큰이 유효하지 않습니다.");
 
     private final HttpStatus status;
     private final int code;

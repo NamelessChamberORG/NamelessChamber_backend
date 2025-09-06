@@ -1,5 +1,7 @@
 package org.example.namelesschamber.common.security;
 
+import org.example.namelesschamber.common.exception.CustomException;
+import org.example.namelesschamber.common.exception.ErrorCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -14,13 +16,7 @@ public class SecurityUtils {
     public static String getCurrentSubject() {
         return getCustomPrincipal()
                 .map(CustomPrincipal::subject)
-                .orElse(null);
-    }
-
-    public static String getCurrentRole() {
-        return getCustomPrincipal()
-                .map(CustomPrincipal::role)
-                .orElse(null);
+                .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
     }
 
     private static Optional<CustomPrincipal> getCustomPrincipal() {
