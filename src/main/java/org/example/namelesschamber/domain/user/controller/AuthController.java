@@ -30,7 +30,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponseDto>> signup(
             @Valid @RequestBody SignupRequestDto request) {
 
-        String subject = SecurityUtils.getCurrentSubject();
+        String subject = SecurityUtils.getCurrentSubjectOrEmpty().orElse(null);
         LoginResponseDto response = userService.signup(request, subject);
 
         return ApiResponse.success(HttpStatus.CREATED, response);
