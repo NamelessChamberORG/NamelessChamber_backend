@@ -15,27 +15,29 @@ public class CoinService {
 
     @Transactional(readOnly = true)
     public int getCoin(String userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
-                .getCoin();
+        return findUserById(userId).getCoin();
+
     }
 
     @Transactional
     public int rewardForPost(String userId, int amount) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = findUserById(userId);
         user.addCoin(amount);
         userRepository.save(user);
-        return user.getCoin(); // 최신 잔액 반환
+        return user.getCoin();
     }
 
     @Transactional
     public int chargeForRead(String userId, int amount) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = findUserById(userId);
         if (user.getCoin() < amount) throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
         user.decreaseCoin(amount);
         userRepository.save(user);
         return user.getCoin();
+    }
+
+    private User findUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 }
