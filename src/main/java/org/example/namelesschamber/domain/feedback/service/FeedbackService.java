@@ -17,8 +17,8 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
 
     @Transactional
-    public void createFeedback(FeedbackRequestDto request, String userId) {
-        Feedback feedback = Feedback.create(userId, request.content());
+    public void createFeedback(FeedbackRequestDto request) {
+        Feedback feedback = Feedback.create(request.content());
         feedbackRepository.save(feedback);
     }
 

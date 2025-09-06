@@ -1,5 +1,6 @@
 package org.example.namelesschamber.domain.user.service;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
@@ -10,10 +11,12 @@ import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.entity.UserRole;
+import org.example.namelesschamber.domain.user.entity.UserStatus;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -25,7 +28,30 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public LoginResponseDto signup(SignupRequestDto request) {
+    public LoginResponseDto signup(SignupRequestDto request, String subject) {
+
+        // 1) 익명 → 회원 전환
+        if (subject != null) {
+            User currentUser = userRepository.findById(subject)
+                    .filter(u -> u.getUserRole() == UserRole.ANONYMOUS)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+            if (userRepository.existsByEmail(request.email())) {
+                throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+            }
+
+            currentUser.updateToMember(
+                    request.email(),
+                    encoderUtils.encode(request.password())
+            );
+
+            userRepository.save(currentUser);
+
+            String accessToken = jwtTokenProvider.createToken(currentUser.getId(), UserRole.USER.name());
+            return LoginResponseDto.of(currentUser, accessToken, null);
+        }
+
+        // 2) 신규 회원가입
         if (userRepository.existsByEmail(request.email())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
@@ -33,13 +59,16 @@ public class UserService {
         User user = User.builder()
                 .email(request.email())
                 .passwordHash(encoderUtils.encode(request.password()))
+                .userRole(UserRole.USER)
                 .build();
+
 
         userRepository.save(user);
 
         String accessToken = jwtTokenProvider.createToken(user.getId(), UserRole.USER.name());
         return LoginResponseDto.of(user, accessToken, null);
     }
+
 
     @Transactional(readOnly = true)
     public LoginResponseDto login(LoginRequestDto request) {
@@ -50,6 +79,10 @@ public class UserService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new CustomException(ErrorCode.USER_NOT_ACTIVE);
+        }
+
         String accessToken = jwtTokenProvider.createToken(user.getId(), UserRole.USER.name());
         return LoginResponseDto.of(user, accessToken, null);
     }
@@ -57,10 +90,30 @@ public class UserService {
 
     @Transactional
     public LoginResponseDto loginAsAnonymous() {
-        String uuid = UUID.randomUUID().toString();
-        String accessToken = jwtTokenProvider.createToken(uuid, UserRole.ANONYMOUS.name());
 
-        return LoginResponseDto.anonymous(uuid, accessToken);
+        User user = User.builder()
+                .userRole(UserRole.ANONYMOUS)
+                .expiresAt(LocalDateTime.now().plusDays(7)) // 7일 TTL
+                .build();
+
+        userRepository.save(user);
+
+        String accessToken = jwtTokenProvider.createToken(user.getId(), user.getUserRole().name());
+        return LoginResponseDto.of(user, accessToken, null);
+    }
+
+
+    @Transactional
+    public void updateNickname(String userId, String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.updateNickname(nickname);
+        userRepository.save(user);
     }
 
 }

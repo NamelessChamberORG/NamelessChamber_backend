@@ -25,10 +25,9 @@ public class FeedbackController {
     @Operation(summary = "피드백 작성", description = "새로운 피드백을 작성합니다. 회원/익명 모두 가능.")
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createFeedback(
-            @RequestBody @Valid FeedbackRequestDto request,
-            @CookieValue(value = "anonymousToken", required = false) String anonymousToken) {
+            @RequestBody @Valid FeedbackRequestDto request) {
 
-        feedbackService.createFeedback(request, anonymousToken);
+        feedbackService.createFeedback(request);
         return ApiResponse.success(HttpStatus.CREATED);
     }
 
