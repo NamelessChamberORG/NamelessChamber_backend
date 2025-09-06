@@ -30,9 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.debug("Incoming token: {}", token);
 
         if (token != null && jwtTokenProvider.isValid(token)) {
-            Claims claims = jwtTokenProvider.parseClaims(token);
-            String subject = claims.getSubject();
-            String role = claims.get("role", String.class);
+
+            String subject = jwtTokenProvider.getSubject(token);
+            String role = jwtTokenProvider.getRole(token);
 
             log.debug("Authenticated subject: {}, role: {}", subject, role);
 

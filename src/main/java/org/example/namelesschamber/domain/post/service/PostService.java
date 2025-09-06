@@ -9,7 +9,8 @@ import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseD
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
-import org.example.namelesschamber.domain.user.entity.UserRole;
+import org.example.namelesschamber.domain.user.entity.User;
+import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public List<PostPreviewResponseDto> getPostPreviews() {
@@ -36,32 +38,42 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(PostCreateRequestDto request, String subject, String role) {
+    public void createPost(PostCreateRequestDto request, String subject) {
         request.type().validateContentLength(request.content());
 
-        Post.PostBuilder builder = Post.builder()
+        User user = userRepository.findById(subject)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.addCoin(1);
+        userRepository.save(user);
+
+        Post post = Post.builder()
                 .title(request.title())
                 .content(request.content())
-                .type(request.type());
+                .type(request.type())
+                .userId(subject)
+                .build();
 
-        if (UserRole.USER.name().equals(role)) {
-            builder.userId(subject);          // 회원이면 userId 저장
-        } else if (UserRole.ANONYMOUS.name().equals(role)) {
-            builder.anonymousToken(subject);  // 익명이면 uuid 저장
-        } else {
-            throw new CustomException(ErrorCode.INVALID_INPUT);
-        }
-
-        postRepository.save(builder.build());
+        postRepository.save(post);
     }
 
-
     @Transactional
-    public PostDetailResponseDto getPostById(String id) {
-        Post post = postRepository.findById(id)
+    public PostDetailResponseDto getPostById(String postId, String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getCoin() <= 0) {
+            throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
+        }
+
+        user.decreaseCoin();
+        userRepository.save(user);
+
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.increaseViews();
+        postRepository.save(post);
 
         return PostDetailResponseDto.from(post);
     }

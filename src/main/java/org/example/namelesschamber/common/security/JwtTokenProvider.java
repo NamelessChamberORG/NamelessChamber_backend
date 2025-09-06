@@ -69,4 +69,13 @@ public class JwtTokenProvider {
         }
     }
 
+    public String getSubject(String token) {
+        return parseClaims(token).getSubject();
+    }
+
+    public String getRole(String token) {
+        return parseClaims(token).get("role", String.class);
+    }
+
+
 }

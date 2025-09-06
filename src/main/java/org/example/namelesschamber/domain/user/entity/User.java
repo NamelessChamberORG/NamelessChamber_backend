@@ -18,6 +18,7 @@ public class User {
     @Id
     private String id;
 
+    @Indexed(unique = true, sparse = true)
     private String email;
 
     @Indexed(unique = true, sparse = true)
@@ -28,6 +29,10 @@ public class User {
     @Builder.Default
     private int coin = 0;
 
+    // USER / ANONYMOUS 회원, 비회원 구분
+    private UserRole userRole;
+
+    // ACTIVE / WITHDRAWN / BANNED 같은 상태
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
@@ -36,4 +41,28 @@ public class User {
 
     private LocalDateTime lastLoginAt;
 
+    // 익명 로그인시 TTL 만료 정책을 위한 컬럼
+    private LocalDateTime expiresAt;
+
+    // 글 작성 시 코인 추가
+    public void addCoin(int amount) {
+        this.coin += amount;
+    }
+
+    public void decreaseCoin(){
+        this.coin--;
+    }
+
+    // 익명 -> 회원가입 시 업데이트
+    public void updateToMember(String email, String passwordHash) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.userRole = UserRole.USER;
+        this.expiresAt = null; // 회원은 TTL 만료 대상에서 제외
+        }
+
+    //닉네임 적용
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }

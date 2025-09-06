@@ -5,7 +5,7 @@ import org.example.namelesschamber.domain.post.entity.Post;
 import java.time.LocalDateTime;
 
 public record PostDetailResponseDto(
-        String id,
+        String postId,
         String title,
         String content,
         long likes,

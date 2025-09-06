@@ -1,16 +1,15 @@
 package org.example.namelesschamber.domain.user.dto.response;
 
 import org.example.namelesschamber.domain.user.entity.User;
-import org.example.namelesschamber.domain.user.entity.UserRole;
 
 public record LoginResponseDto(
-        String id,
+        String userId,
         String email,
         String nickname,
         int coin,
         String accessToken,
         String refreshToken,
-        String role // USER / ANONYMOUS
+        String role
 ) {
     public static LoginResponseDto of(User user, String accessToken, String refreshToken) {
         return new LoginResponseDto(
@@ -20,19 +19,8 @@ public record LoginResponseDto(
                 user.getCoin(),
                 accessToken,
                 refreshToken,
-                UserRole.USER.name()
+                user.getUserRole().name()
         );
     }
 
-    public static LoginResponseDto anonymous(String uuid, String accessToken) {
-        return new LoginResponseDto(
-                uuid,
-                UserRole.ANONYMOUS.name().toLowerCase(),
-                null,
-                0,
-                accessToken,
-                null,
-                UserRole.ANONYMOUS.name()
-        );
-    }
 }

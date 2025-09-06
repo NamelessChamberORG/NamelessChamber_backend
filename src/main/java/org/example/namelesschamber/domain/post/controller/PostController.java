@@ -49,24 +49,25 @@ public class PostController {
 
     @Operation(
             summary = "글 작성",
-            description = "새로운 게시글 작성",
-            security = @SecurityRequirement(name = "BearerAuth")
+            description = "새로운 게시글 작성"
     )
     @PostMapping("/posts")
     public ResponseEntity<ApiResponse<Void>> createPost(
             @RequestBody @Valid PostCreateRequestDto request) {
 
-        String subject = SecurityUtils.getCurrentSubject(); // userId or uuid
-        String role = SecurityUtils.getCurrentRole();       // USER or ANONYMOUS
+        String subject = SecurityUtils.getCurrentSubject();
 
-        postService.createPost(request, subject, role);
+        postService.createPost(request, subject);
         return ApiResponse.success(HttpStatus.CREATED);
     }
 
     @Operation(summary = "특정 글 조회", description = "게시글 ID로 특정 게시글의 상세 내용을 조회합니다.")
     @GetMapping("/posts/{id}")
     public ResponseEntity<ApiResponse<PostDetailResponseDto>> getPostById(@PathVariable String id) {
-        PostDetailResponseDto response = postService.getPostById(id);
+
+        String subject = SecurityUtils.getCurrentSubject();
+
+        PostDetailResponseDto response = postService.getPostById(id, subject);
         return ApiResponse.success(HttpStatus.OK, response);
     }
 }
