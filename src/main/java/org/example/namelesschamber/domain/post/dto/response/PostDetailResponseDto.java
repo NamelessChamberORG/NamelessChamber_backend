@@ -10,16 +10,18 @@ public record PostDetailResponseDto(
         String content,
         long likes,
         long views,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        int coin
 ) {
-    public static PostDetailResponseDto from(Post post) {
+    public static PostDetailResponseDto from(Post post, int coin) {
         return new PostDetailResponseDto(
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
                 post.getLikes(),
                 post.getViews(),
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                coin
         );
     }
 }

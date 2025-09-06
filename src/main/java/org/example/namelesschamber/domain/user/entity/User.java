@@ -49,8 +49,8 @@ public class User {
         this.coin += amount;
     }
 
-    public void decreaseCoin(){
-        this.coin--;
+    public void decreaseCoin(int amount){
+        this.coin -= amount;
     }
 
     // 익명 -> 회원가입 시 업데이트
