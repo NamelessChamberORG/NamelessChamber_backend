@@ -19,6 +19,10 @@ public class SecurityUtils {
                 .orElseThrow(() -> new CustomException(ErrorCode.UNAUTHORIZED));
     }
 
+    public static Optional<String> getCurrentSubjectOrEmpty() {
+        return getCustomPrincipal().map(CustomPrincipal::subject);
+    }
+
     private static Optional<CustomPrincipal> getCustomPrincipal() {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getPrincipal)
