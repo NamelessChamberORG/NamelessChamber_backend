@@ -65,6 +65,7 @@ public class ReadHistoryService {
     /**
      * 열람 기록 저장
      */
+    @Transactional
     public boolean record(String userId, String postId) {
         try {
             readHistoryRepository.save(ReadHistory.of(userId, postId));
