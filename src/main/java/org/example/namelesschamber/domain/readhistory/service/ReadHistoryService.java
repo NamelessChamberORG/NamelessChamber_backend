@@ -5,6 +5,7 @@ import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewListResponse;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
+import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.readhistory.entity.ReadHistory;
 import org.example.namelesschamber.domain.readhistory.repository.ReadHistoryRepository;
@@ -13,6 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,11 +36,18 @@ public class ReadHistoryService {
 
         List<ReadHistory> histories = readHistoryRepository.findAllByUserIdOrderByReadAtDesc(userId);
 
+        List<String> postIds = histories.stream()
+                .map(ReadHistory::getPostId)
+                .toList();
+
+        Map<String, Post> postMap = postRepository.findAllById(postIds)
+                .stream()
+                .collect(Collectors.toMap(Post::getId, Function.identity()));
+
         List<PostPreviewResponseDto> posts = histories.stream()
-                .map(h -> postRepository.findById(h.getPostId())
-                        .map(PostPreviewResponseDto::from)
-                        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND))
-                )
+                .map(history -> postMap.get(history.getPostId()))
+                .filter(Objects::nonNull) // 삭제된 게시글은 스킵
+                .map(PostPreviewResponseDto::from)
                 .toList();
 
         return PostPreviewListResponse.of(posts, coin);
