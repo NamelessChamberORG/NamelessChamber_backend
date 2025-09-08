@@ -28,11 +28,10 @@ public class CoinService {
     }
 
     @Transactional
-    public int chargeForRead(String userId, int amount) {
+    public void chargeForRead(String userId, int amount) {
         User user = findUserById(userId);
         user.decreaseCoin(amount);
         userRepository.save(user);
-        return user.getCoin();
     }
 
     private User findUserById(String userId) {

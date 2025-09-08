@@ -1,6 +1,5 @@
 package org.example.namelesschamber.domain.user.service;
 
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
@@ -9,6 +8,7 @@ import org.example.namelesschamber.common.util.EncoderUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
+import org.example.namelesschamber.domain.user.dto.response.UserInfoResponseDto;
 import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.entity.UserStatus;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +60,6 @@ public class UserService {
                 .passwordHash(encoderUtils.encode(request.password()))
                 .userRole(UserRole.USER)
                 .build();
-
 
         userRepository.save(user);
 
@@ -116,5 +114,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto getMyInfo(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return UserInfoResponseDto.from(user);
+    }
 }
 
