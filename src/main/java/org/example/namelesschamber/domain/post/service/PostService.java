@@ -67,22 +67,24 @@ public class PostService {
     @Transactional
     public PostDetailResponseDto getPostById(String postId, String userId) {
 
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+
         boolean alreadyRead = readHistoryService.isAlreadyRead(userId, postId);
 
-        int coinAfterCharge = alreadyRead
-                ? coinService.getCoin(userId)
-                : coinService.chargeForRead(userId, 1);
+        int coinAfterCharge;
 
-        if (!alreadyRead) {
+        if (alreadyRead) {
+            coinAfterCharge = coinService.getCoin(userId);
+        } else {
+            coinAfterCharge = coinService.chargeForRead(userId, 1);
             readHistoryService.record(userId, postId);
         }
-
-        Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.increaseViews();
         postRepository.save(post);
 
         return PostDetailResponseDto.from(post, coinAfterCharge);
+
     }
 }

@@ -27,7 +27,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final EncoderUtils encoderUtils;
     private final JwtTokenProvider jwtTokenProvider;
-    private final CoinService coinService;
 
     @Transactional
     public LoginResponseDto signup(SignupRequestDto request, String subject) {
