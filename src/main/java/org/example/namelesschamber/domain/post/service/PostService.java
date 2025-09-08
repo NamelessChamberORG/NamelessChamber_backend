@@ -11,8 +11,6 @@ import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseD
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
-import org.example.namelesschamber.domain.readhistory.entity.ReadHistory;
-import org.example.namelesschamber.domain.readhistory.repository.ReadHistoryRepository;
 import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
 import org.springframework.stereotype.Service;
@@ -72,19 +70,17 @@ public class PostService {
 
         boolean alreadyRead = readHistoryService.isAlreadyRead(userId, postId);
 
-        int coinAfterCharge;
-
-        if (alreadyRead) {
-            coinAfterCharge = coinService.getCoin(userId);
-        } else {
-            coinAfterCharge = coinService.chargeForRead(userId, 1);
+        if (!alreadyRead) {
+            coinService.chargeForRead(userId, 1);
             readHistoryService.record(userId, postId);
         }
 
         post.increaseViews();
         postRepository.save(post);
 
-        return PostDetailResponseDto.from(post, coinAfterCharge);
+        int finalCoin = coinService.getCoin(userId);
+
+        return PostDetailResponseDto.from(post, finalCoin);
 
     }
 }
