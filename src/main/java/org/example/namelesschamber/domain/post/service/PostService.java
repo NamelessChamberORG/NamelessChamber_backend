@@ -11,6 +11,7 @@ import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseD
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
+import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final ReadHistoryService readHistoryService;
     private final CoinService coinService;
 
     @Transactional(readOnly = true)
@@ -63,15 +65,20 @@ public class PostService {
     @Transactional
     public PostDetailResponseDto getPostById(String postId, String userId) {
 
-        int coinAfterCharge = coinService.chargeForRead(userId, 1);
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        post.increaseViews();
+        //성공하지 못한다면 이미 읽은 것으로 간주
+        if (readHistoryService.record(userId, postId)) {
+            coinService.chargeForRead(userId, 1);
+        }
 
+        post.increaseViews();
         postRepository.save(post);
 
-        return PostDetailResponseDto.from(post, coinAfterCharge);
+        int finalCoin = coinService.getCoin(userId);
+
+        return PostDetailResponseDto.from(post, finalCoin);
+
     }
 }
