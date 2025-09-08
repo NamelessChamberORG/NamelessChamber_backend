@@ -68,11 +68,9 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        boolean alreadyRead = readHistoryService.isAlreadyRead(userId, postId);
-
-        if (!alreadyRead) {
+        //성공하지 못한다면 이미 읽은 것으로 간주
+        if (readHistoryService.record(userId, postId)) {
             coinService.chargeForRead(userId, 1);
-            readHistoryService.record(userId, postId);
         }
 
         post.increaseViews();

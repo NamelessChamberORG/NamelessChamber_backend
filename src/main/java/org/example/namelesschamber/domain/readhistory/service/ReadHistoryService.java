@@ -1,6 +1,9 @@
 package org.example.namelesschamber.domain.readhistory.service;
 
+import com.mongodb.DuplicateKeyException;
 import lombok.RequiredArgsConstructor;
+import org.example.namelesschamber.common.exception.CustomException;
+import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewListResponse;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
 import org.example.namelesschamber.domain.post.entity.Post;
@@ -62,8 +65,12 @@ public class ReadHistoryService {
     /**
      * 열람 기록 저장
      */
-    @Transactional
-    public void record(String userId, String postId) {
-        readHistoryRepository.save(ReadHistory.of(userId, postId));
+    public boolean record(String userId, String postId) {
+        try {
+            readHistoryRepository.save(ReadHistory.of(userId, postId));
+            return true;
+        } catch (DuplicateKeyException e) {
+            return false;
+        }
     }
 }
