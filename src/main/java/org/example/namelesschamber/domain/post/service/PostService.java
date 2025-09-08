@@ -11,6 +11,9 @@ import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseD
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
+import org.example.namelesschamber.domain.readhistory.entity.ReadHistory;
+import org.example.namelesschamber.domain.readhistory.repository.ReadHistoryRepository;
+import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +25,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final ReadHistoryService readHistoryService;
     private final CoinService coinService;
 
     @Transactional(readOnly = true)
@@ -63,13 +67,20 @@ public class PostService {
     @Transactional
     public PostDetailResponseDto getPostById(String postId, String userId) {
 
-        int coinAfterCharge = coinService.chargeForRead(userId, 1);
+        boolean alreadyRead = readHistoryService.isAlreadyRead(userId, postId);
+
+        int coinAfterCharge = alreadyRead
+                ? coinService.getCoin(userId)
+                : coinService.chargeForRead(userId, 1);
+
+        if (!alreadyRead) {
+            readHistoryService.record(userId, postId);
+        }
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         post.increaseViews();
-
         postRepository.save(post);
 
         return PostDetailResponseDto.from(post, coinAfterCharge);

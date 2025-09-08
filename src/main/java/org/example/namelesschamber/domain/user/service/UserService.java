@@ -9,6 +9,7 @@ import org.example.namelesschamber.common.util.EncoderUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
+import org.example.namelesschamber.domain.user.dto.response.UserInfoResponseDto;
 import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.entity.UserStatus;
@@ -26,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final EncoderUtils encoderUtils;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CoinService coinService;
 
     @Transactional
     public LoginResponseDto signup(SignupRequestDto request, String subject) {
@@ -61,7 +63,6 @@ public class UserService {
                 .passwordHash(encoderUtils.encode(request.password()))
                 .userRole(UserRole.USER)
                 .build();
-
 
         userRepository.save(user);
 
@@ -116,5 +117,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
+    public UserInfoResponseDto getMyInfo(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return UserInfoResponseDto.from(user);
+    }
 }
 
