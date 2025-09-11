@@ -28,6 +28,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } finally {
             long elapsed = System.currentTimeMillis() - start;
+            response.setHeader("Trace-Id", traceId);
             log.info("[{}] Response: status={} time={}ms", traceId, response.getStatus(), elapsed);
         }
     }

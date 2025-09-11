@@ -19,7 +19,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ApiResponse<Object>> handleCustomException(CustomException ex) {
         ErrorCode errorCode = ex.getErrorCode();
-        log.warn("CustomException: {} - {}", errorCode.getCode(), errorCode.getMessage());
+        log.warn("{}: {} - {}",
+                ex.getClass().getSimpleName(),
+                errorCode.getCode(),
+                errorCode.getMessage());
         return ApiResponse.error(
                 errorCode.getStatus(),
                 errorCode.getCode(),
@@ -29,7 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
-        log.error("Unhandled exception", ex);
+        log.error("Unhandled exception: {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
         return ApiResponse.error(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 ErrorCode.INTERNAL_SERVER_ERROR.getCode(),
