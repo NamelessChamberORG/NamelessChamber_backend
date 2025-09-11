@@ -67,5 +67,16 @@ public class PostController {
         PostDetailResponseDto response = postService.getPostById(id, subject);
         return ApiResponse.success(HttpStatus.OK, response);
     }
+
+    @Operation(summary = "내가 쓴 글 조회", description = "내가 작성한 게시글 목록을 반환합니다.")
+    @GetMapping("/posts/me")
+    public ResponseEntity<ApiResponse<List<PostPreviewResponseDto>>> getMyPosts() {
+
+        String subject = SecurityUtils.getCurrentSubject();
+
+        List<PostPreviewResponseDto> response = postService.getMyPosts(subject);
+        return ApiResponse.success(HttpStatus.OK,response);
+    }
+
 }
 
