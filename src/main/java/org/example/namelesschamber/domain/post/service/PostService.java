@@ -81,4 +81,11 @@ public class PostService {
         return PostDetailResponseDto.from(post, finalCoin);
 
     }
+
+    @Transactional(readOnly = true)
+    public List<PostPreviewResponseDto> getMyPosts(String userId) {
+        return postRepository.findAllByUserIdOrderByCreatedAtDesc(userId).stream()
+                .map(PostPreviewResponseDto::from)
+                .toList();
+    }
 }
