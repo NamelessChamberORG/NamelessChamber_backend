@@ -5,7 +5,12 @@ spring:
 
 logging:
   level:
-    root: warn
+    root: info
+    org.springframework: warn
+    org.mongodb.driver: warn
+    com.mongodb.connection: warn
+    javax.management: warn
+    sun.rmi: warn
 
 springdoc:
   api-docs:
@@ -16,8 +21,6 @@ springdoc:
     tryItOutEnabled: true
     supportedSubmitMethods: [get, post, put, delete, patch]
     display-request-duration: true
-
-
 
 server:
   forward-headers-strategy: framework

@@ -19,7 +19,9 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(HttpStatus.BAD_REQUEST,1009, "이미 사용 중인 이메일입니다."),
     USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST,1010,"활성화된 계정이 아닙니다."),
     NOT_ENOUGH_COIN(HttpStatus.BAD_REQUEST,1011,"가지고 있는 코인이 없습니다."),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,1012, "토큰이 유효하지 않습니다.");
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,1012, "토큰이 유효하지 않습니다."),
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, 1013, "지원하지 않는 HTTP 메서드입니다."),
+    INVALID_JSON(HttpStatus.BAD_REQUEST, 1014, "잘못된 요청 형식입니다.");
 
     private final HttpStatus status;
     private final int code;
