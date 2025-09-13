@@ -21,7 +21,8 @@ public enum ErrorCode {
     NOT_ENOUGH_COIN(HttpStatus.BAD_REQUEST,1011,"가지고 있는 코인이 없습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED,1012, "토큰이 유효하지 않습니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, 1013, "지원하지 않는 HTTP 메서드입니다."),
-    INVALID_JSON(HttpStatus.BAD_REQUEST, 1014, "잘못된 요청 형식입니다.");
+    INVALID_JSON(HttpStatus.BAD_REQUEST, 1014, "잘못된 요청 형식입니다."),
+    ALREADY_REGISTERED(HttpStatus.CONFLICT, 1015, "이미 가입된 사용자입니다.");
 
     private final HttpStatus status;
     private final int code;
