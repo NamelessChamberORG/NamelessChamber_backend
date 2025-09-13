@@ -35,6 +35,10 @@ public class UserService {
                     .filter(u -> u.getUserRole() == UserRole.ANONYMOUS)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+            if (currentUser.getUserRole() == UserRole.USER) {
+                throw new CustomException(ErrorCode.ALREADY_REGISTERED);
+            }
+
             if (userRepository.existsByEmail(request.email())) {
                 throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
             }
