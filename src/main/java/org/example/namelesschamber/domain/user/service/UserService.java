@@ -32,7 +32,6 @@ public class UserService {
         // 1) 익명 → 회원 전환
         if (subject != null) {
             User currentUser = userRepository.findById(subject)
-                    .filter(u -> u.getUserRole() == UserRole.ANONYMOUS)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
             if (currentUser.getUserRole() == UserRole.USER) {
