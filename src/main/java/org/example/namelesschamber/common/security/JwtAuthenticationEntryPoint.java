@@ -31,7 +31,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 : ErrorCode.UNAUTHORIZED;
 
         log.warn("Unauthorized request - URI: {}, message: {}",
-                request.getRequestURI(), errorCode.getMessage());
+                request.getRequestURI(), authException.getMessage());
 
         ApiResponse<Object> body = new ApiResponse<>(false, errorCode.getCode(), errorCode.getMessage(), null);
 
