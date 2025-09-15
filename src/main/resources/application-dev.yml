@@ -11,7 +11,7 @@ logging:
     org.springframework.web: debug
     org.springframework.data.mongodb.core.MongoTemplate: debug
     org.springframework.data.mongodb.core.index: info
-    org.springframework.security: info
+    org.springframework.security: debug
     org.mongodb.driver: warn
     com.mongodb.connection: warn
     javax.management: warn

@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.namelesschamber.common.exception.CustomAuthenticationException;
+import org.example.namelesschamber.common.exception.ErrorCode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -22,27 +24,30 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveToken(request);
-        log.debug("Incoming token: {}", token);
+        log.debug("JwtAuthenticationFilter - Incoming token: {}", token != null ? "present" : "null");
 
         if (token != null) {
-            Claims claims = jwtTokenProvider.validateToken(token);
-            String subject = claims.getSubject();
-            String role = claims.get("role", String.class);
+            try {
+                Claims claims = jwtTokenProvider.validateToken(token);
+                String subject = claims.getSubject();
 
-            CustomPrincipal principal = new CustomPrincipal(subject, role);
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(principal, null, List.of());
+                log.debug("JwtAuthenticationFilter - Token validated for subject={}", subject);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
-            log.debug("No valid JWT found, falling back to anonymousUser");
+                CustomPrincipal principal = new CustomPrincipal(subject, claims.get("role", String.class));
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(principal, null, List.of());
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (CustomAuthenticationException ex) {
+                log.warn("JwtAuthenticationFilter - Token validation failed: {}", ex.getErrorCode().getMessage());
+                throw ex;
+            }
         }
 
         filterChain.doFilter(request, response);
