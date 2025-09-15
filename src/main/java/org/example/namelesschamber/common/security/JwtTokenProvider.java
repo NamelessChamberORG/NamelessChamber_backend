@@ -3,6 +3,7 @@ package org.example.namelesschamber.common.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
+import org.example.namelesschamber.common.exception.CustomAuthenticationException;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,9 +72,9 @@ public class JwtTokenProvider {
         try {
             return parseClaims(token);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+            throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED);
         } catch (JwtException | IllegalArgumentException e) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
+            throw new CustomAuthenticationException(ErrorCode.INVALID_TOKEN);
         }
     }
 }
