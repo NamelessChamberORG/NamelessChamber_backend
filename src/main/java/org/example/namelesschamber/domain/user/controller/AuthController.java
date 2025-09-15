@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.common.security.SecurityUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
+import org.example.namelesschamber.domain.user.dto.request.ReissueRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.service.UserService;
@@ -53,4 +54,27 @@ public class AuthController {
         return ApiResponse.success(HttpStatus.OK, response);
     }
 
+    @Operation(
+            summary = "로그아웃",
+            description = "현재 사용자의 Refresh Token을 삭제하여 로그아웃 처리합니다. " +
+                    "Access Token은 만료 시까지 유효하지만, Refresh Token이 삭제되므로 재발급이 불가능해집니다."
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        String userId = SecurityUtils.getCurrentSubject();
+        userService.logout(userId);
+        return ApiResponse.success(HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "토큰 재발급",
+            description = "만료된 Access Token과 Refresh Token을 사용해 새로운 Access Token과 Refresh Token을 발급합니다."
+    )
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<LoginResponseDto>> reissue(
+            @Valid @RequestBody ReissueRequestDto request) {
+
+        LoginResponseDto response = userService.reissueTokens(request.accessToken(), request.refreshToken());
+        return ApiResponse.success(HttpStatus.OK, response);
+    }
 }
