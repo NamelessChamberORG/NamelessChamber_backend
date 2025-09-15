@@ -2,6 +2,7 @@ package org.example.namelesschamber.common.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.common.exception.CustomAuthenticationException;
 import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.common.response.ApiResponse;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -28,10 +30,14 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 ? e.getErrorCode()
                 : ErrorCode.UNAUTHORIZED;
 
+        log.warn("Unauthorized request - URI: {}, message: {}",
+                request.getRequestURI(), errorCode.getMessage());
+
         ApiResponse<Object> body = new ApiResponse<>(false, errorCode.getCode(), errorCode.getMessage(), null);
 
         response.setStatus(errorCode.getStatus().value());
         response.setContentType("application/json;charset=UTF-8");
+        response.setHeader("Cache-Control", "no-store");
         response.getWriter().write(objectMapper.writeValueAsString(body));
     }
 

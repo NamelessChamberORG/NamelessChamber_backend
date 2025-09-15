@@ -1,6 +1,7 @@
 package org.example.namelesschamber.common.config;
 
 import lombok.RequiredArgsConstructor;
+import org.example.namelesschamber.common.security.JwtAuthenticationEntryPoint;
 import org.example.namelesschamber.common.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -35,6 +38,9 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**")
                         .hasRole("ADMIN")
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(customizer ->
+                        customizer.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
