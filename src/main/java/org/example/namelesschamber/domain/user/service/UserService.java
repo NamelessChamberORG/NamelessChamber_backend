@@ -153,6 +153,7 @@ public class UserService {
         return LoginResponseDto.of(user, accessToken, rawRefreshToken);
     }
 
+    @Transactional
     public LoginResponseDto reissueTokens(String accessToken, String refreshToken) {
         Claims claims = jwtTokenProvider.getClaimsEvenIfExpired(accessToken);
         String userId = claims.getSubject();
