@@ -2,6 +2,9 @@ package org.example.namelesschamber.common.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
+import org.example.namelesschamber.common.exception.CustomException;
+import org.example.namelesschamber.common.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,37 +16,31 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final Key key;
-    private final long validityInMs;
+    @Getter
+    private final long accessValidityInMs;
     private final JwtParser parser;
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long validityInMs) {
+            @Value("${jwt.access-expiration}") long accessValidityInMs) {
 
-        //토큰 키 길이 검증
         byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
         if (secretBytes.length < 32) {
             throw new IllegalArgumentException("JWT secret key is too short");
         }
 
         this.key = Keys.hmacShaKeyFor(secretBytes);
-        this.validityInMs = validityInMs;
+        this.accessValidityInMs = accessValidityInMs;
 
-        // 시계 오차 허용(운영 권장): 60초
         this.parser = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .setAllowedClockSkewSeconds(60)
                 .build();
     }
 
-    /**
-     * 토큰 생성
-     * @param subject 회원이면 userId, 비회원이면 uuid
-     * @param role USER / ANONYMOUS
-     */
-    public String createToken(String subject, String role) {
+    public String createAccessToken(String subject, String role) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMs);
+        Date expiry = new Date(now.getTime() + accessValidityInMs);
 
         return Jwts.builder()
                 .setSubject(subject)
@@ -54,18 +51,17 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /** 공통 파싱: 중복 제거용 */
     public Claims parseClaims(String token) {
         return parser.parseClaimsJws(token).getBody();
     }
 
-    /** 유효성 검사: 파싱 성공 여부로 판단 */
-    public boolean isValid(String token) {
+    public void validateToken(String token) {
         try {
             parseClaims(token);
-            return true;
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
 
@@ -76,6 +72,4 @@ public class JwtTokenProvider {
     public String getRole(String token) {
         return parseClaims(token).get("role", String.class);
     }
-
-
 }

@@ -29,15 +29,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         log.debug("Incoming token: {}", token);
 
-        if (token != null && jwtTokenProvider.isValid(token)) {
-
+        if (token != null) {
+            jwtTokenProvider.validateToken(token);
             String subject = jwtTokenProvider.getSubject(token);
             String role = jwtTokenProvider.getRole(token);
 
-            log.debug("Authenticated subject: {}, role: {}", subject, role);
-
             CustomPrincipal principal = new CustomPrincipal(subject, role);
-
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
