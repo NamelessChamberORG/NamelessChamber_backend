@@ -80,7 +80,7 @@ public class UserService {
     }
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -131,7 +131,8 @@ public class UserService {
         return UserInfoResponseDto.from(user);
     }
 
-    private LoginResponseDto issueTokens(User user) {
+    @Transactional
+    public LoginResponseDto issueTokens(User user) {
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getUserRole().name());
 
         String rawRefreshToken = UUID.randomUUID().toString();

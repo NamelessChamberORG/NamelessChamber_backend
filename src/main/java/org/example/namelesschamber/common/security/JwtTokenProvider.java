@@ -55,30 +55,25 @@ public class JwtTokenProvider {
         return parser.parseClaimsJws(token).getBody();
     }
 
-    //만료된 토큰 추출
+    //만료된 토큰 추출, 만료는 허용하지만 나머지는 예외처리
     public Claims getClaimsEvenIfExpired(String token) {
         try {
             return parser.parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
-        }
-    }
-
-    public void validateToken(String token) {
-        try {
-            parseClaims(token);
-        } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         } catch (JwtException | IllegalArgumentException e) {
             throw new CustomException(ErrorCode.INVALID_TOKEN);
         }
     }
 
-    public String getSubject(String token) {
-        return parseClaims(token).getSubject();
-    }
-
-    public String getRole(String token) {
-        return parseClaims(token).get("role", String.class);
+    //액세스 토큰 검증
+    public Claims validateToken(String token) {
+        try {
+            return parseClaims(token);
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
     }
 }
