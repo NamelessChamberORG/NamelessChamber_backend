@@ -1,5 +1,6 @@
 package org.example.namelesschamber.domain.user.service;
 
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
@@ -145,15 +146,16 @@ public class UserService {
                 .expiryDate(expiryDate)
                 .build();
 
-        refreshTokenRepository.findByUserId(user.getId())
-                .ifPresent(existing -> refreshTokenRepository.deleteByUserId(user.getId()));
-
+        refreshTokenRepository.deleteByUserId(user.getId());
         refreshTokenRepository.save(newToken);
 
         return LoginResponseDto.of(user, accessToken, rawRefreshToken);
     }
 
-    public LoginResponseDto reissueTokens(String userId, String refreshToken) {
+    public LoginResponseDto reissueTokens(String accessToken, String refreshToken) {
+        Claims claims = jwtTokenProvider.getClaimsEvenIfExpired(accessToken);
+        String userId = claims.getSubject();
+
         RefreshToken saved = refreshTokenRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
 

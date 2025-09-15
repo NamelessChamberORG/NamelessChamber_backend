@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.common.security.SecurityUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
+import org.example.namelesschamber.domain.user.dto.request.ReissueRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.service.UserService;
@@ -67,13 +68,13 @@ public class AuthController {
 
     @Operation(
             summary = "토큰 재발급",
-            description = "Refresh Token을 사용해 새로운 Access Token과 Refresh Token을 발급합니다."
+            description = "만료된 Access Token과 Refresh Token을 사용해 새로운 Access Token과 Refresh Token을 발급합니다."
     )
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<LoginResponseDto>> reissue(
-            @RequestParam String userId,
-            @RequestParam String refreshToken) {
-        LoginResponseDto response = userService.reissueTokens(userId, refreshToken);
+            @Valid @RequestBody ReissueRequestDto request) {
+
+        LoginResponseDto response = userService.reissueTokens(request.accessToken(), request.refreshToken());
         return ApiResponse.success(HttpStatus.OK, response);
     }
 }

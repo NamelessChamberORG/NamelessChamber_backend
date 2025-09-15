@@ -55,6 +55,15 @@ public class JwtTokenProvider {
         return parser.parseClaimsJws(token).getBody();
     }
 
+    //만료된 토큰 추출
+    public Claims getClaimsEvenIfExpired(String token) {
+        try {
+            return parser.parseClaimsJws(token).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
+
     public void validateToken(String token) {
         try {
             parseClaims(token);
