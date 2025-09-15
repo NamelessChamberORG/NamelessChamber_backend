@@ -1,7 +1,9 @@
 package org.example.namelesschamber.common.exception;
 
+import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 
+@Getter
 public class CustomAuthenticationException extends AuthenticationException {
     private final ErrorCode errorCode;
 
@@ -10,7 +12,4 @@ public class CustomAuthenticationException extends AuthenticationException {
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
 }
