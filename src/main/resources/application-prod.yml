@@ -16,6 +16,7 @@ logging:
     org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter: warn
     org.springframework.security.web.authentication.www.BasicAuthenticationFilter: warn
     org.springframework.web.servlet.DispatcherServlet: warn
+    org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/api]: warn
 
 springdoc:
   api-docs:
