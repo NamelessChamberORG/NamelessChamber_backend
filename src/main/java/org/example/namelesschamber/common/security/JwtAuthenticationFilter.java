@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.namelesschamber.common.config.JwtSecurityProperties;
 import org.example.namelesschamber.common.exception.CustomAuthenticationException;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,9 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
+    private final JwtSecurityProperties jwtSecurityProperties;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -55,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 response.setStatus(entity.getStatusCode().value());
                 response.setContentType("application/json;charset=UTF-8");
                 response.setHeader("Cache-Control", "no-store");
-                response.getWriter().write(new ObjectMapper().writeValueAsString(entity.getBody()));
+                response.getWriter().write(objectMapper.writeValueAsString(entity.getBody()));
                 return;
             }
         }
@@ -74,14 +78,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-
-        return path.startsWith("/auth/login")
-                || path.startsWith("/auth/signup")
-                || path.startsWith("/auth/anonymous")
-                || path.startsWith("/auth/reissue")
-                || path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/swagger-resources");
+        return jwtSecurityProperties.getIgnorePaths().stream()
+                .anyMatch(path::startsWith);
     }
 }
 
