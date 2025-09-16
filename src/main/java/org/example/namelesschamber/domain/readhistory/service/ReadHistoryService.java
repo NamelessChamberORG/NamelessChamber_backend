@@ -2,8 +2,6 @@ package org.example.namelesschamber.domain.readhistory.service;
 
 import org.springframework.dao.DuplicateKeyException;
 import lombok.RequiredArgsConstructor;
-import org.example.namelesschamber.common.exception.CustomException;
-import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewListResponse;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
 import org.example.namelesschamber.domain.post.entity.Post;
