@@ -26,6 +26,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
+        String uri = request.getRequestURI();
+
+        if (uri.startsWith("/api/swagger-ui") ||
+                uri.startsWith("/api/v3/api-docs") ||
+                uri.startsWith("/api/swagger-resources")) {
+            response.addHeader("WWW-Authenticate", "Basic realm=\"Swagger UI\"");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+            return;
+        }
+
         ErrorCode errorCode = resolveErrorCode(authException);
 
         log.warn("Unauthorized request - URI: {}, errorCode: {}, rootMessage: {}, springMessage: {}",

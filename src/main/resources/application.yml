@@ -35,6 +35,3 @@ security:
       - /auth/signup
       - /auth/anonymous
       - /auth/reissue
-      - /swagger-ui
-      - /v3/api-docs
-      - /swagger-resources
