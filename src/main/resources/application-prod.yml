@@ -11,6 +11,11 @@ logging:
     com.mongodb.connection: warn
     javax.management: warn
     sun.rmi: warn
+    org.springframework.security.web.FilterChainProxy: warn
+    org.springframework.security.web.access.ExceptionTranslationFilter: warn
+    org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter: warn
+    org.springframework.security.web.authentication.www.BasicAuthenticationFilter: warn
+
 
 springdoc:
   api-docs:
