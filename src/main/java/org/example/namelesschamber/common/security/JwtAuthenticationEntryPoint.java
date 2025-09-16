@@ -28,8 +28,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         ErrorCode errorCode = resolveErrorCode(authException);
 
-        log.warn("Unauthorized request - URI: {}, message: {}",
-                request.getRequestURI(), authException.getMessage());
+        log.warn("Unauthorized request - URI: {}, errorCode: {}, rootMessage: {}, springMessage: {}",
+                request.getRequestURI(),
+                errorCode.name(),
+                (authException.getCause() != null ? authException.getCause().getMessage() : "-"),
+                authException.getMessage()
+        );
 
         ApiResponse<Object> body = new ApiResponse<>(false, errorCode.getCode(), errorCode.getMessage(), null);
 
