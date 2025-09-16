@@ -1,5 +1,6 @@
 package org.example.namelesschamber.common.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.namelesschamber.common.config.JwtSecurityProperties;
 import org.example.namelesschamber.common.exception.CustomAuthenticationException;
+import org.example.namelesschamber.common.response.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -23,6 +27,9 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
+    private final JwtSecurityProperties jwtSecurityProperties;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -45,7 +52,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (CustomAuthenticationException ex) {
                 log.warn("JwtAuthenticationFilter - Token validation failed: {}", ex.getErrorCode().getMessage());
-                throw ex;
+
+                ResponseEntity<ApiResponse<Object>> entity =
+                        ApiResponse.error(ex.getErrorCode().getStatus(), ex.getErrorCode().getCode(), ex.getErrorCode().getMessage());
+
+                response.setStatus(entity.getStatusCode().value());
+                response.setContentType("application/json;charset=UTF-8");
+                response.setHeader("Cache-Control", "no-store");
+                response.getWriter().write(objectMapper.writeValueAsString(entity.getBody()));
+                return;
             }
         }
 
@@ -59,4 +74,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return jwtSecurityProperties.getIgnorePaths().stream()
+                .anyMatch(path::startsWith);
+    }
 }
+

@@ -27,3 +27,14 @@ logging:
 swagger:
   username: ${SWAGGER_USERNAME}
   password: ${SWAGGER_PASSWORD}
+
+security:
+  jwt:
+    ignore-paths:
+      - /auth/login
+      - /auth/signup
+      - /auth/anonymous
+      - /auth/reissue
+      - /swagger-ui
+      - /v3/api-docs
+      - /swagger-resources

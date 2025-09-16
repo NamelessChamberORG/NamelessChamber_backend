@@ -20,7 +20,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
+    private final JwtSecurityProperties jwtSecurityProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/anonymous", "/auth/reissue").permitAll()
+                        .requestMatchers(jwtSecurityProperties.getIgnorePaths().toArray(new String[0])).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**")
                         .hasRole("ADMIN")
                         .anyRequest().authenticated()
