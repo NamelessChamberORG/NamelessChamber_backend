@@ -26,9 +26,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
 
-        ErrorCode errorCode = (authException instanceof CustomAuthenticationException e)
-                ? e.getErrorCode()
-                : ErrorCode.UNAUTHORIZED;
+        ErrorCode errorCode =
+                (authException instanceof CustomAuthenticationException e) ? e.getErrorCode()
+                        : (authException.getCause() instanceof CustomAuthenticationException e) ? e.getErrorCode()
+                        : ErrorCode.UNAUTHORIZED;
 
         log.warn("Unauthorized request - URI: {}, message: {}",
                 request.getRequestURI(), authException.getMessage());
