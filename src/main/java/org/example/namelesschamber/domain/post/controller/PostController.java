@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
-import org.example.namelesschamber.common.security.SecurityUtils;
+import org.example.namelesschamber.domain.auth.core.SecurityUtils;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
 import org.example.namelesschamber.domain.post.dto.response.PostCreateResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;

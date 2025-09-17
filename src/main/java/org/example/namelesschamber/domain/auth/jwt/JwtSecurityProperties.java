@@ -1,4 +1,4 @@
-package org.example.namelesschamber.common.config;
+package org.example.namelesschamber.domain.auth.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

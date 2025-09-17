@@ -1,4 +1,4 @@
-package org.example.namelesschamber.common.security;
+package org.example.namelesschamber.domain.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

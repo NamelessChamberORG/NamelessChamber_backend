@@ -1,4 +1,4 @@
-package org.example.namelesschamber.common.security;
+package org.example.namelesschamber.domain.auth.core;
 
 public record CustomPrincipal(
         String subject,

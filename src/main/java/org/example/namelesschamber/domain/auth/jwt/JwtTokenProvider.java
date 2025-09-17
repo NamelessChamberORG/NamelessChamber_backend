@@ -1,4 +1,4 @@
-package org.example.namelesschamber.common.security;
+package org.example.namelesschamber.domain.auth.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

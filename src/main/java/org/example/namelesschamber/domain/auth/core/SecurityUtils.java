@@ -1,4 +1,4 @@
-package org.example.namelesschamber.common.security;
+package org.example.namelesschamber.domain.auth.core;
 
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
