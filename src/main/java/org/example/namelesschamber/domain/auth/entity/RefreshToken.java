@@ -1,4 +1,4 @@
-package org.example.namelesschamber.domain.user.entity;
+package org.example.namelesschamber.domain.auth.entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

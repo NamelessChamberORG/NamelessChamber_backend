@@ -1,8 +1,8 @@
-package org.example.namelesschamber.domain.user.dto.request;
+package org.example.namelesschamber.domain.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record LoginRequestDto(
+public record SignupRequestDto(
         @NotBlank
         String email,
         @NotBlank
