@@ -10,7 +10,7 @@ import org.example.namelesschamber.domain.auth.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.auth.dto.request.ReissueRequestDto;
 import org.example.namelesschamber.domain.auth.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.auth.dto.response.LoginResponseDto;
-import org.example.namelesschamber.domain.user.service.UserService;
+import org.example.namelesschamber.domain.auth.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Auth", description = "회원가입 및 로그인 API")
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
     @Operation(
             summary = "회원가입",
@@ -35,7 +35,7 @@ public class AuthController {
             @Valid @RequestBody SignupRequestDto request) {
 
         String subject = SecurityUtils.getCurrentSubjectOrEmpty().orElse(null);
-        LoginResponseDto response = userService.signup(request, subject);
+        LoginResponseDto response = authService.signup(request, subject);
 
         return ApiResponse.success(HttpStatus.CREATED, response);
     }
@@ -43,7 +43,7 @@ public class AuthController {
     @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력받아 로그인합니다. 성공 시 회원 정보와 토큰을 반환합니다.")
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponseDto>> login(@Valid @RequestBody LoginRequestDto request) {
-        LoginResponseDto response = userService.login(request);
+        LoginResponseDto response = authService.login(request);
         return ApiResponse.success(HttpStatus.OK, response);
     }
 
@@ -53,7 +53,7 @@ public class AuthController {
     )
     @PostMapping("/anonymous")
     public ResponseEntity<ApiResponse<LoginResponseDto>> anonymousLogin() {
-        LoginResponseDto response = userService.loginAsAnonymous();
+        LoginResponseDto response = authService.loginAsAnonymous();
         return ApiResponse.success(HttpStatus.OK, response);
     }
 
@@ -65,7 +65,7 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout() {
         String userId = SecurityUtils.getCurrentSubject();
-        userService.logout(userId);
+        authService.logout(userId);
         return ApiResponse.success(HttpStatus.OK);
     }
 
@@ -77,7 +77,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponseDto>> reissue(
             @Valid @RequestBody ReissueRequestDto request) {
 
-        LoginResponseDto response = userService.reissueTokens(request.accessToken(), request.refreshToken());
+        LoginResponseDto response = authService.reissueTokens(request.accessToken(), request.refreshToken());
         return ApiResponse.success(HttpStatus.OK, response);
     }
 }
