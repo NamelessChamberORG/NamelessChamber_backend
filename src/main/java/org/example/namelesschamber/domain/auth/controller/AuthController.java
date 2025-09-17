@@ -77,7 +77,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponseDto>> reissue(
             @Valid @RequestBody ReissueRequestDto request) {
 
-        LoginResponseDto response = authService.reissueTokens(request.accessToken(), request.refreshToken());
+        LoginResponseDto response = authService.reissueTokens(request);
         return ApiResponse.success(HttpStatus.OK, response);
     }
 }

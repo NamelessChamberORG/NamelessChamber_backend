@@ -38,6 +38,11 @@ public class AuthService {
 
     @Transactional
     public LoginResponseDto signup(SignupRequestDto request, String subject) {
+
+        if (userRepository.existsByEmail(request.email())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
         // 익명 사용자 → 회원 전환
         if (subject != null) {
             User currentUser = userRepository.findById(subject)
@@ -45,9 +50,6 @@ public class AuthService {
 
             if (currentUser.getUserRole() == UserRole.USER) {
                 throw new CustomException(ErrorCode.ALREADY_REGISTERED);
-            }
-            if (userRepository.existsByEmail(request.email())) {
-                throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
             }
 
             currentUser.updateToMember(
@@ -60,10 +62,6 @@ public class AuthService {
         }
 
         // 신규 회원가입
-        if (userRepository.existsByEmail(request.email())) {
-            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-        }
-
         User user = User.builder()
                 .email(request.email())
                 .passwordHash(encoderUtils.encode(request.password()))
