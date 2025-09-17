@@ -1,4 +1,4 @@
-package org.example.namelesschamber.common.security;
+package org.example.namelesschamber.domain.auth.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.namelesschamber.common.config.JwtSecurityProperties;
+import org.example.namelesschamber.domain.auth.core.CustomPrincipal;
 import org.example.namelesschamber.common.exception.CustomAuthenticationException;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.springframework.http.ResponseEntity;

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
-import org.example.namelesschamber.common.security.SecurityUtils;
+import org.example.namelesschamber.domain.auth.core.SecurityUtils;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewListResponse;
 import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.springframework.http.HttpStatus;
