@@ -1,8 +1,9 @@
 package org.example.namelesschamber.common.config;
 
 import lombok.RequiredArgsConstructor;
-import org.example.namelesschamber.common.security.JwtAuthenticationEntryPoint;
-import org.example.namelesschamber.common.security.JwtAuthenticationFilter;
+import org.example.namelesschamber.domain.auth.jwt.JwtAuthenticationEntryPoint;
+import org.example.namelesschamber.domain.auth.jwt.JwtAuthenticationFilter;
+import org.example.namelesschamber.domain.auth.jwt.JwtSecurityProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;

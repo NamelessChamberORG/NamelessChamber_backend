@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
-import org.example.namelesschamber.common.security.JwtTokenProvider;
+import org.example.namelesschamber.domain.auth.jwt.JwtTokenProvider;
 import org.example.namelesschamber.common.util.EncoderUtils;
 import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
