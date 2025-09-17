@@ -1,4 +1,4 @@
-package org.example.namelesschamber.domain.user.dto.response;
+package org.example.namelesschamber.domain.auth.dto.response;
 
 import org.example.namelesschamber.domain.user.entity.User;
 

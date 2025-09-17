@@ -1,4 +1,4 @@
-package org.example.namelesschamber.domain.user.controller;
+package org.example.namelesschamber.domain.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -6,14 +6,17 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.example.namelesschamber.domain.auth.core.SecurityUtils;
-import org.example.namelesschamber.domain.user.dto.request.LoginRequestDto;
-import org.example.namelesschamber.domain.user.dto.request.ReissueRequestDto;
-import org.example.namelesschamber.domain.user.dto.request.SignupRequestDto;
-import org.example.namelesschamber.domain.user.dto.response.LoginResponseDto;
+import org.example.namelesschamber.domain.auth.dto.request.LoginRequestDto;
+import org.example.namelesschamber.domain.auth.dto.request.ReissueRequestDto;
+import org.example.namelesschamber.domain.auth.dto.request.SignupRequestDto;
+import org.example.namelesschamber.domain.auth.dto.response.LoginResponseDto;
 import org.example.namelesschamber.domain.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor

@@ -1,6 +1,6 @@
-package org.example.namelesschamber.domain.user.repository;
+package org.example.namelesschamber.domain.auth.repository;
 
-import org.example.namelesschamber.domain.user.entity.RefreshToken;
+import org.example.namelesschamber.domain.auth.entity.RefreshToken;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
