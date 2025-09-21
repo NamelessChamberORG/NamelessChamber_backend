@@ -32,6 +32,11 @@ public class UserService {
     public UserInfoResponseDto getMyInfo(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getNickname() == null || user.getNickname().isBlank()) {
+            throw new CustomException(ErrorCode.NICKNAME_NOT_FOUND);
+        }
+
         return UserInfoResponseDto.from(user);
     }
 }
