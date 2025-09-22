@@ -8,11 +8,9 @@ jwt:
 refresh:
   expiration: 1209600000
 
-
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
-
 
 spring:
   data:
@@ -35,3 +33,9 @@ security:
       - /auth/signup
       - /auth/anonymous
       - /auth/reissue
+      - /metrics/**
+
+discord:
+  webhook:
+    url: ${DISCORD_WEBHOOK_URL}
+
