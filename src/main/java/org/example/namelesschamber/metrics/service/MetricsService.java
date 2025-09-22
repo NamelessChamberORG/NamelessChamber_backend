@@ -59,7 +59,7 @@ public class MetricsService {
         double ratio = (totalUsers == 0) ? 0.0 : (double) members / totalUsers * 100;
 
         Map<String, Object> embed = Map.of(
-                "title", "📊 오늘의 무명소 지표",
+                "title", "📊 오늘의 무명소",
                 "color", 5814783,
                 "fields", List.of(
                         Map.of("name", "", "value", "", "inline", false),
@@ -68,7 +68,7 @@ public class MetricsService {
                         Map.of("name", "📈 익명 대비 신규 회원 비율", "value", String.format("%.1f%%", ratio), "inline", false)
                 ),
                 "footer", Map.of(
-                        "text", "NamelessChamber Metrics",
+                        "text", "Moomyeongso Metrics",
                         "icon_url", "https://cdn-icons-png.flaticon.com/512/1828/1828640.png"
                 ),
                 "timestamp", Instant.now().toString()
