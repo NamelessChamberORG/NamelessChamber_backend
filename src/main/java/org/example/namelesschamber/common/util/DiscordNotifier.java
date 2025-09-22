@@ -27,31 +27,28 @@ public class DiscordNotifier {
     }
 
     @Async
-    public void send(String message) {
+    public void sendEmbed(Map<String, Object> body) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        Map<String, String> body = Map.of("content", message);
-        HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         int maxAttempts = 3;
-        int attempt = 0;
-
-        while (attempt < maxAttempts) {
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                attempt++;
                 restTemplate.postForEntity(webhookUrl, request, Void.class);
-                log.info("Discord 알림 전송 성공 (시도 {}회)", attempt);
+                log.info("Discord Embed 알림 전송 성공 (시도 {}회)", attempt);
                 return;
             } catch (RestClientException e) {
-                log.error("Discord 알림 전송 실패 (시도 {}회)", attempt, e);
+                log.error("Discord Embed 알림 전송 실패 (시도 {}회)", attempt, e);
 
-                if (attempt >= maxAttempts) {
-                    log.error("Discord 알림 전송 최종 실패)");
+                if (attempt == maxAttempts) {
+                    log.error("Discord Embed 알림 최종 실패 (총 {}회 시도)", attempt);
                     break;
                 }
+
                 try {
-                    Thread.sleep(2000L * attempt);
+                    Thread.sleep(1000L * attempt); // 1초, 2초 backoff
                 } catch (InterruptedException ie) {
                     Thread.currentThread().interrupt();
                     log.warn("재시도 대기 중 인터럽트 발생");

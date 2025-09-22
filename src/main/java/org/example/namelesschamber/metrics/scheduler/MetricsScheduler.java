@@ -7,6 +7,8 @@ import org.example.namelesschamber.common.util.DiscordNotifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -17,8 +19,8 @@ public class MetricsScheduler {
 
     @Scheduled(cron = "0 0 23 * * *")
     public void reportMetricsEveryDay() {
-        String report = metricsService.buildMetricsReport();
-        discordNotifier.send(report);
+        Map<String, Object> report = metricsService.buildMetricsEmbed();
+        discordNotifier.sendEmbed(report);
         log.info("Metrics report sent to Discord: {}", report);
     }
 }
