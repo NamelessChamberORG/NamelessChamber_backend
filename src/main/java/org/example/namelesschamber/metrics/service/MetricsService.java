@@ -40,7 +40,7 @@ public class MetricsService {
         double ratio = (totalUsers == 0) ? 0.0 : (double) members / totalUsers * 100;
 
         return String.format(
-                "📊 오늘의 무명소 지표\n- 오늘 작성된 글: %d개\n- 오늘 신규 회원가입: %d명\n- 익명 대비 신규 회원 비율: %.1f%%",
+                "📊 오늘의 무명소 지표\n- 작성된 고민: %d개\n- 신규 회원가입: %d명\n- 익명 대비 신규 회원 비율: %.1f%%",
                 posts, members, ratio
         );
     }
