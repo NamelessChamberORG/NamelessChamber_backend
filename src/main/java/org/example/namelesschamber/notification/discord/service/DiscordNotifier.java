@@ -1,7 +1,9 @@
-package org.example.namelesschamber.common.util;
+package org.example.namelesschamber.notification.discord.service;
 
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.example.namelesschamber.notification.discord.dto.DiscordEmbedDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,8 @@ import java.util.Map;
 @Component
 public class DiscordNotifier {
 
+    private static final int MAX_ATTEMPTS = 3;
+
     private final RestTemplate restTemplate;
     private final String webhookUrl;
 
@@ -27,14 +31,15 @@ public class DiscordNotifier {
     }
 
     @Async
-    public void sendEmbed(Map<String, Object> body) {
+    public void sendEmbed(DiscordEmbedDto embedDto) {
+        Map<String, Object> body = Map.of("embeds", java.util.List.of(embedDto));
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
-        int maxAttempts = 3;
-        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             try {
                 restTemplate.postForEntity(webhookUrl, request, Void.class);
                 log.info("Discord Embed 알림 전송 성공 (시도 {}회)", attempt);
@@ -42,7 +47,7 @@ public class DiscordNotifier {
             } catch (RestClientException e) {
                 log.error("Discord Embed 알림 전송 실패 (시도 {}회)", attempt, e);
 
-                if (attempt == maxAttempts) {
+                if (attempt == MAX_ATTEMPTS) {
                     log.error("Discord Embed 알림 최종 실패 (총 {}회 시도)", attempt);
                     break;
                 }
