@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/metrics")
 @RequiredArgsConstructor
@@ -27,10 +29,11 @@ public class MetricsController {
         return ApiResponse.success(HttpStatus.OK, report);
     }
 
+    @Operation(summary = "디스코드 알림 전송", description = "스케쥴러로 구동되는 디스코드 알림을 수동으로 전송합니다.")
     @PostMapping("/today/notify")
     public ResponseEntity<ApiResponse<Void>> notifyTodayMetrics() {
-        String report = metricsService.buildMetricsReport();
-        discordNotifier.send(report);
+        Map<String, Object> embed = metricsService.buildMetricsEmbed();
+        discordNotifier.sendEmbed(embed);
         return ApiResponse.success(HttpStatus.OK, null);
     }
 }
