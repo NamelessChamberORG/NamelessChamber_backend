@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DiscordNotifier {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     @Value("${discord.webhook.url}")
     private String webhookUrl;
