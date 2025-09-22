@@ -16,7 +16,7 @@ public class MetricsScheduler {
     private final DiscordNotifier discordNotifier;
 
     @Scheduled(cron = "0 */3 * * * *")
-    public void reportMetricsEveryFiveMinutes() {
+    public void reportMetricsEveryDay() {
         String report = metricsService.buildMetricsReport();
         discordNotifier.send(report);
         log.info("Metrics report sent to Discord: {}", report);
