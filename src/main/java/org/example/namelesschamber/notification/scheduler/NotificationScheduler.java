@@ -28,7 +28,7 @@ public class NotificationScheduler {
 //    }
 
     @Scheduled(cron = "0 0 23 * * *")
-    public void sendDailyMetricsReportText() {
+    public void sendDailyMetricsReport() {
         TodayMetricsDto metrics = metricsService.getTodayMetrics();
         DiscordTextDto texts = metricsDiscordFormatter.toDiscordText(metrics);
         discordNotifier.sendText(texts);

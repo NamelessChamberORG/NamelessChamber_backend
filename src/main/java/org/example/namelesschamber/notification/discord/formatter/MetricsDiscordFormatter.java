@@ -29,6 +29,9 @@ public class MetricsDiscordFormatter {
 //        );
 //    }
     public DiscordTextDto toDiscordText(TodayMetricsDto metrics) {
+        long totalUsers = metrics.members() + metrics.anonymous();
+        double ratio = (totalUsers == 0) ? 0.0 : (double) metrics.members() / totalUsers * 100;
+
         String content = """
             📊 **오늘의 무명소**
             
@@ -45,8 +48,7 @@ public class MetricsDiscordFormatter {
                 metrics.shortPosts(),
                 metrics.longPosts(),
                 metrics.members(),
-                (metrics.members() + metrics.anonymous()) == 0 ? 0.0 :
-                        (double) metrics.members() / (metrics.members() + metrics.anonymous()) * 100
+                ratio
         );
 
         return new DiscordTextDto(content);
