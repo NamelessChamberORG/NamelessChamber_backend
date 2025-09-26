@@ -1,6 +1,7 @@
 package org.example.namelesschamber.metrics.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
@@ -22,10 +23,11 @@ public class MetricsService {
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.plusDays(1).atStartOfDay();
 
-        long posts = postRepository.countByCreatedAtBetween(start, end);
+        long shortPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.SHORT, start, end);
+        long longPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.LONG, start, end);
         long members = userRepository.countByUserRoleAndCreatedAtBetween(UserRole.USER, start, end);
         long anonymous = userRepository.countByUserRoleAndCreatedAtBetween(UserRole.ANONYMOUS, start, end);
 
-        return new TodayMetricsDto(posts, members, anonymous);
+        return new TodayMetricsDto(shortPosts, longPosts, members, anonymous);
     }
 }

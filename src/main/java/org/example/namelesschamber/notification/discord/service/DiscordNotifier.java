@@ -1,9 +1,7 @@
 package org.example.namelesschamber.notification.discord.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.example.namelesschamber.notification.discord.dto.DiscordEmbedDto;
+import org.example.namelesschamber.notification.discord.dto.DiscordTextDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -31,8 +29,8 @@ public class DiscordNotifier {
     }
 
     @Async
-    public void sendEmbed(DiscordEmbedDto embedDto) {
-        Map<String, Object> body = Map.of("embeds", java.util.List.of(embedDto));
+    public void sendText(DiscordTextDto dto) {
+        Map<String, Object> body = Map.of("content", dto.content());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -42,13 +40,13 @@ public class DiscordNotifier {
         for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             try {
                 restTemplate.postForEntity(webhookUrl, request, Void.class);
-                log.info("Discord Embed 알림 전송 성공 (시도 {}회)", attempt);
+                log.info("Discord Text 알림 전송 성공 (시도 {}회)", attempt);
                 return;
             } catch (RestClientException e) {
-                log.error("Discord Embed 알림 전송 실패 (시도 {}회)", attempt, e);
+                log.error("Discord Text 알림 전송 실패 (시도 {}회)", attempt, e);
 
                 if (attempt == MAX_ATTEMPTS) {
-                    log.error("Discord Embed 알림 최종 실패 (총 {}회 시도)", attempt);
+                    log.error("Discord Text 알림 최종 실패 (총 {}회 시도)", attempt);
                     break;
                 }
 
@@ -62,4 +60,38 @@ public class DiscordNotifier {
             }
         }
     }
+
+
+//    @Async
+//    public void sendEmbed(DiscordEmbedDto embedDto) {
+//        Map<String, Object> body = Map.of("embeds", java.util.List.of(embedDto));
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+//
+//        for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+//            try {
+//                restTemplate.postForEntity(webhookUrl, request, Void.class);
+//                log.info("Discord Embed 알림 전송 성공 (시도 {}회)", attempt);
+//                return;
+//            } catch (RestClientException e) {
+//                log.error("Discord Embed 알림 전송 실패 (시도 {}회)", attempt, e);
+//
+//                if (attempt == MAX_ATTEMPTS) {
+//                    log.error("Discord Embed 알림 최종 실패 (총 {}회 시도)", attempt);
+//                    break;
+//                }
+//
+//                try {
+//                    Thread.sleep(1000L * attempt); // 1초, 2초 backoff
+//                } catch (InterruptedException ie) {
+//                    Thread.currentThread().interrupt();
+//                    log.warn("재시도 대기 중 인터럽트 발생");
+//                    break;
+//                }
+//            }
+//        }
+//    }
 }

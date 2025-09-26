@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.metrics.dto.TodayMetricsDto;
 import org.example.namelesschamber.metrics.service.MetricsService;
-import org.example.namelesschamber.notification.discord.dto.DiscordEmbedDto;
+import org.example.namelesschamber.notification.discord.dto.DiscordTextDto;
 import org.example.namelesschamber.notification.discord.formatter.MetricsDiscordFormatter;
 import org.example.namelesschamber.notification.discord.service.DiscordNotifier;
 import org.example.namelesschamber.common.response.ApiResponse;
@@ -27,8 +27,8 @@ public class NotificationController {
     @PostMapping("/metrics/today")
     public ResponseEntity<ApiResponse<Void>> notifyTodayMetrics() {
         TodayMetricsDto metrics = metricsService.getTodayMetrics();
-        DiscordEmbedDto embed = metricsDiscordFormatter.toDiscordEmbed(metrics);
-        discordNotifier.sendEmbed(embed);
-        return ApiResponse.success(HttpStatus.OK, null);
+        DiscordTextDto texts = metricsDiscordFormatter.toDiscordText(metrics);
+        discordNotifier.sendText(texts);
+        return ApiResponse.success(HttpStatus.OK);
     }
 }

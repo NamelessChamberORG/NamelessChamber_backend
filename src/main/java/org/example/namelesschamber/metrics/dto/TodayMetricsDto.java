@@ -1,4 +1,8 @@
 package org.example.namelesschamber.metrics.dto;
 
-public record TodayMetricsDto(long posts, long members, long anonymous) {
-}
+public record TodayMetricsDto(
+        long shortPosts,
+        long longPosts,
+        long members,
+        long anonymous
+) {}

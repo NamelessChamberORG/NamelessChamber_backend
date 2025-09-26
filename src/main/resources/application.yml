@@ -4,7 +4,7 @@ server:
 
 jwt:
   secret: ${JWT_SECRET}
-  access-expiration: 60000
+  access-expiration: 1800000
 refresh:
   expiration: 1209600000
 
