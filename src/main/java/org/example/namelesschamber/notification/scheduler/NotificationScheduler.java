@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.metrics.dto.TodayMetricsDto;
 import org.example.namelesschamber.metrics.service.MetricsService;
-import org.example.namelesschamber.notification.discord.dto.DiscordEmbedDto;
 import org.example.namelesschamber.notification.discord.dto.DiscordTextDto;
 import org.example.namelesschamber.notification.discord.formatter.MetricsDiscordFormatter;
 import org.example.namelesschamber.notification.discord.service.DiscordNotifier;
