@@ -28,18 +28,17 @@ public class AdminUserService {
 
     @Transactional(readOnly = true)
     public AdminUserResponseDto getUserById(String id) {
-        return userRepository.findByIdAndUserRole(id, UserRole.USER)
-                .map(AdminUserResponseDto::from)
+        User user = userRepository.findByIdAndUserRole(id, UserRole.USER)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return AdminUserResponseDto.from(user);
     }
 
     @Transactional(readOnly = true)
     public AdminUserResponseDto getUserByNickname(String nickname) {
-        return userRepository.findByNicknameAndUserRole(nickname, UserRole.USER)
-                .map(AdminUserResponseDto::from)
+        User user = userRepository.findByNicknameAndUserRole(nickname, UserRole.USER)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        return AdminUserResponseDto.from(user);
     }
-
 
     @Transactional
     public void updateUserStatus(String id, AdminUserRequestDto request) {
