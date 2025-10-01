@@ -48,7 +48,7 @@ public class AuthService {
             User currentUser = userRepository.findById(subject)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-            if (currentUser.getUserRole() == UserRole.USER) {
+            if (currentUser.getUserRole().isUser()) {
                 throw new CustomException(ErrorCode.ALREADY_REGISTERED);
             }
 
