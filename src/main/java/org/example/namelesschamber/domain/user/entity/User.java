@@ -68,4 +68,9 @@ public class User {
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
+
+    public void changeStatus(UserStatus status) {
+        this.status = status;
+    }
+
 }

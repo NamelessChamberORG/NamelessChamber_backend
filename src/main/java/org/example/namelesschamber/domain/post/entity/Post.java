@@ -45,6 +45,14 @@ public class Post {
     public void increaseViews() {
         this.views += 1;
     }
+
+    public void updateByAdmin(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+    public void deleteByAdmin() {
+        this.isDeleted = true;
+    }
 }
 
 
