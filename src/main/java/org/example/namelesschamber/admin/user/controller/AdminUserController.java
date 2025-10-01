@@ -2,6 +2,7 @@ package org.example.namelesschamber.admin.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.admin.user.dto.request.AdminUserRequestDto;
 import org.example.namelesschamber.admin.user.dto.response.AdminUserResponseDto;
@@ -33,7 +34,7 @@ public class AdminUserController {
         return ResponseEntity.ok(adminUserService.getUserById(id));
     }
 
-    @Operation(summary = "유저 상세 조회 (닉네임)", description = "관리자가 특정 유저의 상세 정보를 닉네임으로 조회합니다. (ROLE_USER만 대상)")
+    @Operation(summary = "유저 상세 조회 (닉네임)", description = "관리자가 특정 유저의 상세 정보를 닉네임으로 조회합니다. (USER만 대상)")
     @GetMapping("/users/nickname/{nickname}")
     public ResponseEntity<AdminUserResponseDto> getUserByNickname(@PathVariable String nickname) {
         return ResponseEntity.ok(adminUserService.getUserByNickname(nickname));
@@ -43,6 +44,7 @@ public class AdminUserController {
     @PatchMapping("/users/{id}/status")
     public ResponseEntity<Void> updateUserStatus(
             @PathVariable String id,
+            @Valid
             @RequestBody AdminUserRequestDto request
     ) {
         adminUserService.updateUserStatus(id, request);

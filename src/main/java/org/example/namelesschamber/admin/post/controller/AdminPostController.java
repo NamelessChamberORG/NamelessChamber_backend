@@ -2,6 +2,7 @@ package org.example.namelesschamber.admin.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.admin.post.dto.request.AdminPostRequestDto;
 import org.example.namelesschamber.admin.post.dto.response.AdminPostResponseDto;
@@ -39,6 +40,7 @@ public class AdminPostController {
     @PatchMapping("/posts/{id}")
     public ResponseEntity<Void> updatePost(
             @PathVariable String id,
+            @Valid
             @RequestBody AdminPostRequestDto request
     ) {
         adminPostService.updatePost(id, request);
