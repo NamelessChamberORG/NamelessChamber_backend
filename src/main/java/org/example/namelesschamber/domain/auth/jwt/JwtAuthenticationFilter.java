@@ -14,6 +14,7 @@ import org.example.namelesschamber.common.exception.CustomAuthenticationExceptio
 import org.example.namelesschamber.common.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -41,13 +42,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 Claims claims = jwtTokenProvider.validateToken(token);
+                String role = claims.get("role", String.class);
                 String subject = claims.getSubject();
 
                 log.debug("JwtAuthenticationFilter - Token validated for subject={}", subject);
 
                 CustomPrincipal principal = new CustomPrincipal(subject, claims.get("role", String.class));
                 UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(principal, null, List.of());
+                        new UsernamePasswordAuthenticationToken(principal, null, List.of(
+                                new SimpleGrantedAuthority("ROLE_" + role)
+                        ));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (CustomAuthenticationException ex) {
