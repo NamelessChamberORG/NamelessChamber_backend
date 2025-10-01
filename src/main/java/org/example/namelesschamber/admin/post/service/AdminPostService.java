@@ -43,6 +43,7 @@ public class AdminPostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         post.updateByAdmin(request.title(), request.content());
+        postRepository.save(post);
     }
 
     @Transactional
@@ -50,5 +51,6 @@ public class AdminPostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
         post.deleteByAdmin();
+        postRepository.save(post);
     }
 }

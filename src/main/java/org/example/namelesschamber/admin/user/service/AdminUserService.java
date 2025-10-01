@@ -43,7 +43,7 @@ public class AdminUserService {
 
     @Transactional
     public void updateUserStatus(String id, AdminUserRequestDto request) {
-        User user = userRepository.findById(id)
+        User user = userRepository.findByIdAndUserRole(id, UserRole.USER)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.changeStatus(request.status());
         userRepository.save(user);
