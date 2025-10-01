@@ -25,7 +25,8 @@ public enum ErrorCode {
     ALREADY_REGISTERED(HttpStatus.CONFLICT, 1015, "이미 가입된 사용자입니다."),
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED,1016, "만료된 토큰입니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 1017, "인증이 필요합니다."),
-    NICKNAME_NOT_FOUND(HttpStatus.CONFLICT,1018,"접근을 위해 닉네임 설정이 필요합니다.");
+    NICKNAME_NOT_FOUND(HttpStatus.CONFLICT,1018,"접근을 위해 닉네임 설정이 필요합니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, 1019, "접근 권한이 없습니다.");
 
     private final HttpStatus status;
     private final int code;
