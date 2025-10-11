@@ -24,7 +24,7 @@ public class Topic {
         this.publishedDate = date;
     }
 
-    public void reset() {
+    public void ready() {
         this.status = TopicStatus.READY;
     }
 }

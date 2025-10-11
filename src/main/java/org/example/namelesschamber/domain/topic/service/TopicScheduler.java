@@ -37,7 +37,7 @@ public class TopicScheduler {
         List<Topic> oldPublished = topicRepository
                 .findAllByStatusAndPublishedDateBefore(TopicStatus.PUBLISHED, today);
         if (!oldPublished.isEmpty()) {
-            oldPublished.forEach(Topic::reset);
+            oldPublished.forEach(Topic::ready);
             topicRepository.saveAll(oldPublished);
             log.debug("[TopicScheduler] {}건의 과거 발행 항목을 READY로 되돌림", oldPublished.size());
         }
@@ -50,7 +50,7 @@ public class TopicScheduler {
             if (publishedToday.size() > 1) {
                 List<Topic> duplicatesToReset =
                         new ArrayList<>(publishedToday.subList(0, publishedToday.size() - 1));
-                duplicatesToReset.forEach(Topic::reset);
+                duplicatesToReset.forEach(Topic::ready);
                 topicRepository.saveAll(duplicatesToReset);
 
                 log.warn("[TopicScheduler] 오늘자 중복 PUBLISHED {}건 발견 → 최신 1개만 유지, {}개 READY로 되돌림",
@@ -81,7 +81,7 @@ public class TopicScheduler {
         List<Topic> sorted = topicRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
         if (sorted.isEmpty()) throw new CustomException(ErrorCode.TOPIC_NOT_FOUND);
 
-        sorted.forEach(Topic::reset);
+        sorted.forEach(Topic::ready);
         topicRepository.saveAll(sorted);
 
         return sorted.get(0);

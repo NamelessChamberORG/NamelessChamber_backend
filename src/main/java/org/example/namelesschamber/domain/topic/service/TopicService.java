@@ -20,8 +20,7 @@ public class TopicService {
 
     public TopicResponseDto getTodayTopic() {
         LocalDate today = LocalDate.now(KST);
-
-        return topicRepository.findByStatusAndPublishedDate(TopicStatus.PUBLISHED, today)
+        return topicRepository.findTopByStatusAndPublishedDateOrderByIdDesc(TopicStatus.PUBLISHED, today)
                 .map(TopicResponseDto::from)
                 .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
     }

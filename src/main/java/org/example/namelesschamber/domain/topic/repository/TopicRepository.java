@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface TopicRepository extends MongoRepository<Topic, String> {
 
-    Optional<Topic> findByStatusAndPublishedDate(TopicStatus status, LocalDate publishedDate);
     List<Topic> findAllByStatusAndPublishedDate(TopicStatus status, LocalDate publishedDate);
     Optional<Topic> findFirstByStatusOrderByIdAsc(TopicStatus status);
     Optional<Topic> findFirstByStatusAndIdGreaterThanOrderByIdAsc(TopicStatus status, String id);
     List<Topic> findAllByStatusAndPublishedDateBefore(TopicStatus status, LocalDate publishedDate);
     Optional<Topic> findTopByStatusOrderByIdDesc(TopicStatus status);
+    Optional<Topic> findTopByStatusAndPublishedDateOrderByIdDesc(TopicStatus status, LocalDate publishedDate);
 
 }
