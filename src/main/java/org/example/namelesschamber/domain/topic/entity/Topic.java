@@ -31,4 +31,8 @@ public class Topic {
         this.status = TopicStatus.READY;
         this.publishedDate = null;
     }
+
+    public void setStatus(TopicStatus status) {
+        this.status = status;
+    }
 }
