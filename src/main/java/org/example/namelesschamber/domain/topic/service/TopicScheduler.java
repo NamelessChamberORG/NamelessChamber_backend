@@ -7,6 +7,7 @@ import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.topic.entity.Topic;
 import org.example.namelesschamber.domain.topic.entity.TopicStatus;
 import org.example.namelesschamber.domain.topic.repository.TopicRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -77,11 +78,12 @@ public class TopicScheduler {
      * 모든 주제를 READY로 초기화하고 첫 번째 주제를 반환
      */
     private Topic resetAndFetchFirst() {
-        List<Topic> all = topicRepository.findAll();
-        all.forEach(Topic::reset);
-        topicRepository.saveAll(all);
+        List<Topic> sorted = topicRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+        if (sorted.isEmpty()) throw new CustomException(ErrorCode.TOPIC_NOT_FOUND);
 
-        return topicRepository.findFirstByStatusOrderByIdAsc(TopicStatus.READY)
-                .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
+        sorted.forEach(Topic::reset);
+        topicRepository.saveAll(sorted);
+
+        return sorted.get(0);
     }
 }
