@@ -1,9 +1,6 @@
 package org.example.namelesschamber.domain.topic.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,6 +16,7 @@ public class Topic {
     private String id;
     private String title;
     private String subtitle;
+    @Setter
     private TopicStatus status;
     private LocalDate publishedDate;
 
@@ -30,9 +28,5 @@ public class Topic {
     public void reset() {
         this.status = TopicStatus.READY;
         this.publishedDate = null;
-    }
-
-    public void setStatus(TopicStatus status) {
-        this.status = status;
     }
 }
