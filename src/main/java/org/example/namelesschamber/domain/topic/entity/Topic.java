@@ -16,7 +16,6 @@ public class Topic {
     private String id;
     private String title;
     private String subtitle;
-    @Setter
     private TopicStatus status;
     private LocalDate publishedDate;
 
@@ -27,6 +26,5 @@ public class Topic {
 
     public void reset() {
         this.status = TopicStatus.READY;
-        this.publishedDate = null;
     }
 }

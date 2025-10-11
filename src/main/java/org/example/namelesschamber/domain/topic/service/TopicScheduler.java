@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class TopicScheduler {
         List<Topic> oldPublished = topicRepository
                 .findAllByStatusAndPublishedDateBefore(TopicStatus.PUBLISHED, today);
         if (!oldPublished.isEmpty()) {
-            oldPublished.forEach(t -> t.setStatus(TopicStatus.READY));
+            oldPublished.forEach(Topic::reset);
             topicRepository.saveAll(oldPublished);
             log.debug("[TopicScheduler] {}건의 과거 발행 항목을 READY로 되돌림", oldPublished.size());
         }
@@ -46,28 +47,25 @@ public class TopicScheduler {
             // ObjectId ASC 정렬 → 마지막이 최신
             publishedToday.sort(Comparator.comparing(Topic::getPublishedDate).thenComparing(Topic::getId));
             if (publishedToday.size() > 1) {
-                for (int i = 0; i < publishedToday.size() - 1; i++) {
-                    Topic dup = publishedToday.get(i);
-                    dup.setStatus(TopicStatus.READY);
-                }
-                topicRepository.saveAll(publishedToday.subList(0, publishedToday.size() - 1));
+                List<Topic> duplicatesToReset =
+                        new ArrayList<>(publishedToday.subList(0, publishedToday.size() - 1));
+                duplicatesToReset.forEach(Topic::reset);
+                topicRepository.saveAll(duplicatesToReset);
+
                 log.warn("[TopicScheduler] 오늘자 중복 PUBLISHED {}건 발견 → 최신 1개만 유지, {}개 READY로 되돌림",
-                        publishedToday.size(), publishedToday.size() - 1);
+                        publishedToday.size(), duplicatesToReset.size());
             }
             log.info("[TopicScheduler] {} 주제는 이미 발행되었습니다.", today);
             return;
         }
 
         // 최근 발행 기준으로 다음 READY 선택
-        Topic lastPublished = topicRepository
-                .findTopByStatusOrderByIdDesc(TopicStatus.PUBLISHED) // 최신 발행
-                .orElse(null);
-
-        Topic next = (lastPublished == null)
-                ? topicRepository.findFirstByStatusOrderByIdAsc(TopicStatus.READY)
-                .orElseGet(this::resetAndFetchFirst)
-                : topicRepository.findFirstByStatusAndIdGreaterThanOrderByIdAsc(
-                        TopicStatus.READY, lastPublished.getId())
+        Topic next = topicRepository.findTopByStatusOrderByIdDesc(TopicStatus.PUBLISHED)
+                .flatMap(lp ->
+                        topicRepository.findFirstByStatusAndIdGreaterThanOrderByIdAsc(
+                                TopicStatus.READY, lp.getId()))
+                .or(() ->
+                        topicRepository.findFirstByStatusOrderByIdAsc(TopicStatus.READY))
                 .orElseGet(this::resetAndFetchFirst);
 
         next.publish(today);
