@@ -13,4 +13,5 @@ public interface PostRepository extends MongoRepository<Post, String> {
     List<Post> findAllByUserIdOrderByCreatedAtDesc(String userId);
     long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
     long countByTypeAndCreatedAtBetween(PostType type, LocalDateTime start, LocalDateTime end);
+    long countByType(PostType type);
 }

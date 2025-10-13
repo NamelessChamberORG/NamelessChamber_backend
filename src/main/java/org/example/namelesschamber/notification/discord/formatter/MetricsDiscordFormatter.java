@@ -35,19 +35,24 @@ public class MetricsDiscordFormatter {
         String content = """
             📊 **오늘의 무명소**
             
-            📝 작성된 글
-            - 오늘 작성된 짧은 기록 : **%d개**
-            - 오늘 작성된 깊은 고민 : **%d개**
+            📝 **작성된 글**
+            - 짧은 기록 : **%d개** (누적 %d개)
+            - 깊은 고민 : **%d개** (누적 %d개)
+            - 오늘의 주제 : **%d개** (누적 %d개)
     
-            👤 신규 회원가입
-            - 오늘 회원가입 : **%d명**
-    
-            📈 익명 대비 신규 회원비율
-            - **%.1f%%**
+            👤 **회원 현황**
+            - 신규 회원가입 : **%d명**
+            - 익명 이용자 : **%d명**
+            - 익명 대비 신규 회원 비율 : **%.1f%%**
             """.formatted(
                 metrics.shortPosts(),
+                metrics.shortTotalPosts(),
                 metrics.longPosts(),
+                metrics.longTotalPosts(),
+                metrics.todayPosts(),
+                metrics.todayTotalPosts(),
                 metrics.members(),
+                metrics.anonymous(),
                 ratio
         );
 
