@@ -24,10 +24,15 @@ public class MetricsService {
         LocalDateTime end = today.plusDays(1).atStartOfDay();
 
         long shortPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.SHORT, start, end);
+        long shortTotalPosts = postRepository.countByType(PostType.SHORT);
         long longPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.LONG, start, end);
+        long longTotalPosts = postRepository.countByType(PostType.LONG);
+        long todayPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.TODAY, start, end);
+        long todayTotalPosts = postRepository.countByType(PostType.TODAY);
         long members = userRepository.countByUserRoleAndCreatedAtBetween(UserRole.USER, start, end);
         long anonymous = userRepository.countByUserRoleAndCreatedAtBetween(UserRole.ANONYMOUS, start, end);
 
-        return new TodayMetricsDto(shortPosts, longPosts, members, anonymous);
+        return new TodayMetricsDto(shortPosts,shortTotalPosts, longPosts, longTotalPosts,
+                todayPosts,todayTotalPosts, members, anonymous);
     }
 }
