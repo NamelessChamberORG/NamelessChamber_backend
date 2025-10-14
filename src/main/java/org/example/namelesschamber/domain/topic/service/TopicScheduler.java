@@ -33,15 +33,6 @@ public class TopicScheduler {
     public void publishNextTopic() {
         LocalDate today = LocalDate.now(KST);
 
-        //어제까지 PUBLISHED → READY
-        List<Topic> oldPublished = topicRepository
-                .findAllByStatusAndPublishedDateBefore(TopicStatus.PUBLISHED, today);
-        if (!oldPublished.isEmpty()) {
-            oldPublished.forEach(Topic::ready);
-            topicRepository.saveAll(oldPublished);
-            log.debug("[TopicScheduler] {}건의 과거 발행 항목을 READY로 되돌림", oldPublished.size());
-        }
-
         //최신 1개만 PUBLISHED 유지, 나머지 READY로 되돌림
         List<Topic> publishedToday = topicRepository.findAllByStatusAndPublishedDate(TopicStatus.PUBLISHED, today);
         if (!publishedToday.isEmpty()) {
@@ -60,6 +51,7 @@ public class TopicScheduler {
             return;
         }
 
+
         // 최근 발행 기준으로 다음 READY 선택
         Topic next = topicRepository.findTopByStatusOrderByIdDesc(TopicStatus.PUBLISHED)
                 .flatMap(lp ->
@@ -72,6 +64,15 @@ public class TopicScheduler {
         next.publish(today);
         topicRepository.save(next);
         log.info("[TopicScheduler] 오늘의 주제 발행 완료: {}", next.getTitle());
+
+        // 발행 이후: 어제까지 PUBLISHED → READY
+        List<Topic> oldPublished = topicRepository
+                .findAllByStatusAndPublishedDateBefore(TopicStatus.PUBLISHED, today);
+        if (!oldPublished.isEmpty()) {
+            oldPublished.forEach(Topic::ready);
+            topicRepository.saveAll(oldPublished);
+            log.debug("[TopicScheduler] {}건의 과거 발행 항목을 READY로 되돌림", oldPublished.size());
+        }
     }
 
     /**
