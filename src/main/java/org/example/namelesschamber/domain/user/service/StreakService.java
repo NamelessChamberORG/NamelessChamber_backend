@@ -28,45 +28,36 @@ public class StreakService {
         LocalDate today = LocalDate.now(KST);
         String todayStr = today.toString();
 
-        // 1) 오늘 아직 처리 안 된 유저만 '오늘 처리'로 선점(원자적). 변경 전 스냅샷을 before로 받음
+        //오늘 아직 처리 안 된 유저만 '오늘 처리'로 선점(원자적). 변경 전 스냅샷을 before로 받음
         Query guard = Query.query(Criteria.where("_id").is(user.getId())
                 .and("streak.lastSeenDate").ne(todayStr));
         Update markToday = new Update()
                 .set("streak.lastSeenDate", todayStr)
                 .set("streak.todayMarked", true);
         FindAndModifyOptions opts = FindAndModifyOptions.options()
-                .returnNew(false)  // 변경 '전' 문서 반환
+                .returnNew(false)
                 .upsert(false);
 
         User before = mongoTemplate.findAndModify(guard, markToday, opts, User.class);
 
-        // 1-1) 이미 오늘 처리됨 → 아무 것도 하지 않음
         if (before == null) return;
 
-        // 2) 오늘 '처음' 처리된 경우 → 이전 상태 기반 계산
         Streak prev = before.getStreak();
-        if (prev == null) {
-            // 극초기 방어: streak 없던 사용자
-            initStreak(user.getId(), todayStr);
-            return;
-        }
+        final int newCurrent;
+        final int newBest;
 
-        boolean continued = today.minusDays(1).toString().equals(prev.getLastSeenDate());
-        int newCurrent = continued ? prev.getCurrent() + 1 : 1;
-        int newBest = Math.max(prev.getBest(), newCurrent);
+        if (prev == null) {
+            newCurrent = 1;
+            newBest = 1;
+        } else {
+            boolean continued = today.minusDays(1).toString().equals(prev.getLastSeenDate());
+            newCurrent = continued ? prev.getCurrent() + 1 : 1;
+            newBest = Math.max(prev.getBest(), newCurrent);
+        }
 
         Update calc = new Update()
                 .set("streak.current", newCurrent)
                 .set("streak.best", newBest);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(user.getId())), calc, User.class);
-    }
-
-    private void initStreak(String userId, String todayStr) {
-        Update init = new Update()
-                .set("streak.current", 1)
-                .set("streak.best", 1)
-                .set("streak.lastSeenDate", todayStr)
-                .set("streak.todayMarked", true);
-        mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(userId)), init, User.class);
     }
 }
