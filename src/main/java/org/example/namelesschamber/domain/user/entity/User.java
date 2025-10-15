@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import static org.example.namelesschamber.common.util.TimeUtils.KST;
 
 @Document(collection = "users")
 @Getter
@@ -46,7 +46,7 @@ public class User {
     private Streak streak = Streak.builder()
             .current(1)
             .best(1)
-            .lastSeenDate(LocalDate.now(ZoneId.of("Asia/Seoul")).toString())
+            .lastSeenDate(LocalDate.now(KST).toString())
             .todayMarked(true)
             .build();
 

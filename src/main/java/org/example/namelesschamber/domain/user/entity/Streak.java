@@ -2,7 +2,8 @@ package org.example.namelesschamber.domain.user.entity;
 
 import lombok.*;
 
-@Getter @Setter @Builder
+@Getter
+@Builder
 @NoArgsConstructor @AllArgsConstructor
 @ToString
 public class Streak {

@@ -12,10 +12,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import static org.example.namelesschamber.common.util.TimeUtils.KST;
 
 @Slf4j
 @Component
@@ -23,7 +23,6 @@ import java.util.List;
 public class TopicScheduler {
 
     private final TopicRepository topicRepository;
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     /**
      * 매일 자정(한국시간) 기준으로 다음 READY 주제를 발행.

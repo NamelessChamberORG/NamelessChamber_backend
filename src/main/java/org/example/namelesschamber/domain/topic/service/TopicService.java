@@ -9,14 +9,13 @@ import org.example.namelesschamber.domain.topic.repository.TopicRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
+import static org.example.namelesschamber.common.util.TimeUtils.KST;
 
 @Service
 @RequiredArgsConstructor
 public class TopicService {
 
     private final TopicRepository topicRepository;
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     public TopicResponseDto getTodayTopic() {
         LocalDate today = LocalDate.now(KST);

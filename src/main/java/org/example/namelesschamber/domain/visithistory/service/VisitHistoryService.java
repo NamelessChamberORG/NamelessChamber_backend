@@ -9,15 +9,15 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
+import static org.example.namelesschamber.common.util.TimeUtils.KST;
 
 @Service
 @RequiredArgsConstructor
 public class VisitHistoryService {
     private final MongoTemplate mongoTemplate;
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     public void recordDailyVisit(String userId) {
         LocalDate today = LocalDate.now(KST);
@@ -27,7 +27,8 @@ public class VisitHistoryService {
         //문서가 없을때만 값을 세팅, 있다면 패스 (하루에 한번이라는 멱등성을 보장)
         Update u = new Update()
                 .setOnInsert("userId", userId)
-                .setOnInsert("date", today.toString());
+                .setOnInsert("date", today.toString())
+                .setOnInsert("createdAt", LocalDateTime.now(KST));
         mongoTemplate.upsert(q, u, VisitHistory.class);
     }
 

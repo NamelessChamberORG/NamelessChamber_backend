@@ -9,12 +9,12 @@ import org.example.namelesschamber.domain.auth.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.auth.dto.request.ReissueRequestDto;
 import org.example.namelesschamber.domain.auth.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.auth.dto.response.LoginResponseDto;
-import org.example.namelesschamber.domain.auth.jwt.JwtTokenProvider;
 import org.example.namelesschamber.domain.auth.entity.RefreshToken;
+import org.example.namelesschamber.domain.auth.jwt.JwtTokenProvider;
+import org.example.namelesschamber.domain.auth.repository.RefreshTokenRepository;
 import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.entity.UserStatus;
-import org.example.namelesschamber.domain.auth.repository.RefreshTokenRepository;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.example.namelesschamber.domain.user.service.StreakService;
 import org.example.namelesschamber.domain.visithistory.service.VisitHistoryService;
@@ -63,7 +63,11 @@ public class AuthService {
 
             userRepository.save(currentUser);
             visitHistoryService.recordDailyVisit(currentUser.getId());
-            streakService.updateOnVisitAndGetCurrent(currentUser);
+            streakService.updateOnVisit(currentUser);
+
+            currentUser = userRepository.findById(currentUser.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
             return issueTokens(currentUser);
         }
 
@@ -74,7 +78,9 @@ public class AuthService {
                 .userRole(UserRole.USER)
                 .build();
 
+        visitHistoryService.recordDailyVisit(user.getId());
         userRepository.save(user);
+
         return issueTokens(user);
     }
 
@@ -92,7 +98,10 @@ public class AuthService {
 
         if (user.getUserRole() != UserRole.ANONYMOUS) {
             visitHistoryService.recordDailyVisit(user.getId());
-            streakService.updateOnVisitAndGetCurrent(user);
+            streakService.updateOnVisit(user);
+
+            user = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         }
 
         return issueTokens(user);

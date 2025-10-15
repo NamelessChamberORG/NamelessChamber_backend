@@ -11,13 +11,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
+import static org.example.namelesschamber.common.util.TimeUtils.KST;
 
 @Service
 @RequiredArgsConstructor
 public class StreakService {
-
-    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
 
     private final MongoTemplate mongoTemplate;
 
@@ -26,7 +24,7 @@ public class StreakService {
      * - 오늘 이미 처리된 경우: no-op 후 현재 current(best 포함)는 DB에서 읽어 반환
      * - 오늘 첫 처리: 어제 방문이면 +1, 아니면 1로 리셋. best는 항상 max 반영
      */
-    public void updateOnVisitAndGetCurrent(User user) {
+    public void updateOnVisit(User user) {
         LocalDate today = LocalDate.now(KST);
         String todayStr = today.toString();
 
