@@ -26,7 +26,7 @@ public class StreakService {
      * - 오늘 이미 처리된 경우: no-op 후 현재 current(best 포함)는 DB에서 읽어 반환
      * - 오늘 첫 처리: 어제 방문이면 +1, 아니면 1로 리셋. best는 항상 max 반영
      */
-    public int updateOnVisitAndGetCurrent(User user) {
+    public void updateOnVisitAndGetCurrent(User user) {
         LocalDate today = LocalDate.now(KST);
         String todayStr = today.toString();
 
@@ -45,14 +45,14 @@ public class StreakService {
         // 1-1) 이미 오늘 처리됨 → DB에서 최신값 읽어 반환 (in-memory user는 최신이 아닐 수 있음)
         if (before == null) {
             User cur = mongoTemplate.findById(user.getId(), User.class);
-            return (cur != null && cur.getStreak() != null) ? cur.getStreak().getCurrent() : 1;
+            return;
         }
 
         // 2) 오늘 '처음' 처리된 경우 → 이전 상태 기반 계산
         Streak prev = before.getStreak();
         if (prev == null) {
             initStreak(user.getId(), todayStr);
-            return 1;
+            return;
         }
 
         String prevDate = prev.getLastSeenDate();
@@ -65,8 +65,6 @@ public class StreakService {
                 .set("streak.current", newCurrent)
                 .set("streak.best", newBest);
         mongoTemplate.updateFirst(Query.query(Criteria.where("_id").is(user.getId())), calc, User.class);
-
-        return newCurrent;
     }
 
     private void initStreak(String userId, String todayStr) {

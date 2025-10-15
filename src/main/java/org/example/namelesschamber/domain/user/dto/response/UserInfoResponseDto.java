@@ -1,7 +1,6 @@
 package org.example.namelesschamber.domain.user.dto.response;
 
 import lombok.Builder;
-import org.example.namelesschamber.domain.user.entity.Streak;
 import org.example.namelesschamber.domain.user.entity.User;
 
 import java.time.LocalDateTime;
