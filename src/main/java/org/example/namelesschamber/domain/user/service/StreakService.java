@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import static org.example.namelesschamber.common.util.TimeUtils.KST;
@@ -24,6 +25,7 @@ public class StreakService {
      * - 오늘 이미 처리된 경우: no-op 후 현재 current(best 포함)는 DB에서 읽어 반환
      * - 오늘 첫 처리: 어제 방문이면 +1, 아니면 1로 리셋. best는 항상 max 반영
      */
+    @Transactional("mongoTransactionManager")
     public void updateOnVisit(User user) {
         LocalDate today = LocalDate.now(KST);
         String todayStr = today.toString();

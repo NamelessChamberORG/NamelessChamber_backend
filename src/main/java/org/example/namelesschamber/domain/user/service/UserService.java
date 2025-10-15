@@ -15,7 +15,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void updateNickname(String userId, String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);

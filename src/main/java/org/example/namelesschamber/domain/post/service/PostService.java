@@ -44,7 +44,7 @@ public class PostService {
         return PostPreviewListResponse.of(posts, coin);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public PostCreateResponseDto createPost(PostCreateRequestDto request, String userId) {
         request.type().validateContentLength(request.content());
 
@@ -62,7 +62,7 @@ public class PostService {
         return new PostCreateResponseDto(coinAfterCreate, post.getId());
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public PostDetailResponseDto getPostById(String postId, String userId) {
 
         Post post = postRepository.findById(postId)

@@ -16,7 +16,7 @@ public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void createFeedback(FeedbackRequestDto request) {
         Feedback feedback = Feedback.create(request.content());
         feedbackRepository.save(feedback);

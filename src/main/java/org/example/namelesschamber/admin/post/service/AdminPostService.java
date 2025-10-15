@@ -38,7 +38,7 @@ public class AdminPostService {
         return AdminPostResponseDto.from(post);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void updatePost(String id, AdminPostRequestDto request) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
@@ -46,7 +46,7 @@ public class AdminPostService {
         postRepository.save(post);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void deletePost(String id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));

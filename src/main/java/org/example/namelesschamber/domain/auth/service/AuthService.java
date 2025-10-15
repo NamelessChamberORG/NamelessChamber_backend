@@ -40,7 +40,7 @@ public class AuthService {
     @Value("${refresh.expiration}")
     private long refreshValidityInMs;
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto signup(SignupRequestDto request, String subject) {
 
         if (userRepository.existsByEmail(request.email())) {
@@ -78,13 +78,13 @@ public class AuthService {
                 .userRole(UserRole.USER)
                 .build();
 
-        visitHistoryService.recordDailyVisit(user.getId());
         userRepository.save(user);
+        visitHistoryService.recordDailyVisit(user.getId());
 
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -107,7 +107,7 @@ public class AuthService {
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto loginAsAnonymous() {
         User user = User.builder()
                 .userRole(UserRole.ANONYMOUS)
@@ -118,7 +118,7 @@ public class AuthService {
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto reissueTokens(ReissueRequestDto request) {
         Claims claims = jwtTokenProvider.getClaimsEvenIfExpired(request.accessToken());
         String userId = claims.getSubject();
@@ -139,7 +139,7 @@ public class AuthService {
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void logout(String userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
