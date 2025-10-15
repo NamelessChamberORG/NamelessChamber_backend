@@ -9,7 +9,8 @@ public record LoginResponseDto(
         int coin,
         String accessToken,
         String refreshToken,
-        String role
+        String role,
+        int currentStreak
 ) {
     public static LoginResponseDto of(User user, String accessToken, String refreshToken) {
         return new LoginResponseDto(
@@ -19,7 +20,8 @@ public record LoginResponseDto(
                 user.getCoin(),
                 accessToken,
                 refreshToken,
-                user.getUserRole().name()
+                user.getUserRole().name(),
+                user.getStreak().getCurrent()
         );
     }
 
