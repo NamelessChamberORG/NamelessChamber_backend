@@ -8,5 +8,6 @@ public record TodayMetricsDto(
         long todayPosts,
         long todayTotalPosts,
         long members,
-        long anonymous
+        long anonymous,
+        long totalMembers
 ) {}
