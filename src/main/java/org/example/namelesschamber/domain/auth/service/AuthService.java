@@ -16,6 +16,8 @@ import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.entity.UserStatus;
 import org.example.namelesschamber.domain.auth.repository.RefreshTokenRepository;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
+import org.example.namelesschamber.domain.user.service.StreakService;
+import org.example.namelesschamber.domain.visithistory.service.VisitHistoryService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,8 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final EncoderUtils encoderUtils;
+    private final VisitHistoryService visitHistoryService;
+    private final StreakService streakService;
 
     @Value("${refresh.expiration}")
     private long refreshValidityInMs;
@@ -58,6 +62,8 @@ public class AuthService {
             );
 
             userRepository.save(currentUser);
+            visitHistoryService.recordDailyVisit(currentUser.getId());
+            streakService.updateOnVisitAndGetCurrent(currentUser);
             return issueTokens(currentUser);
         }
 
@@ -82,6 +88,11 @@ public class AuthService {
         }
         if (user.getStatus() != UserStatus.ACTIVE) {
             throw new CustomException(ErrorCode.USER_NOT_ACTIVE);
+        }
+
+        if (user.getUserRole() != UserRole.ANONYMOUS) {
+            visitHistoryService.recordDailyVisit(user.getId());
+            streakService.updateOnVisitAndGetCurrent(user);
         }
 
         return issueTokens(user);
