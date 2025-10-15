@@ -42,22 +42,18 @@ public class StreakService {
 
         User before = mongoTemplate.findAndModify(guard, markToday, opts, User.class);
 
-        // 1-1) 이미 오늘 처리됨 → DB에서 최신값 읽어 반환 (in-memory user는 최신이 아닐 수 있음)
-        if (before == null) {
-            User cur = mongoTemplate.findById(user.getId(), User.class);
-            return;
-        }
+        // 1-1) 이미 오늘 처리됨 → 아무 것도 하지 않음
+        if (before == null) return;
 
         // 2) 오늘 '처음' 처리된 경우 → 이전 상태 기반 계산
         Streak prev = before.getStreak();
         if (prev == null) {
+            // 극초기 방어: streak 없던 사용자
             initStreak(user.getId(), todayStr);
             return;
         }
 
-        String prevDate = prev.getLastSeenDate();
-        boolean continued = today.minusDays(1).toString().equals(prevDate);
-
+        boolean continued = today.minusDays(1).toString().equals(prev.getLastSeenDate());
         int newCurrent = continued ? prev.getCurrent() + 1 : 1;
         int newBest = Math.max(prev.getBest(), newCurrent);
 
