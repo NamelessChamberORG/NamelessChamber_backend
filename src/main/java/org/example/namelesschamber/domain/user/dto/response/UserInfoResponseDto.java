@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.user.dto.response;
 
 import lombok.Builder;
+import org.example.namelesschamber.domain.user.entity.Streak;
 import org.example.namelesschamber.domain.user.entity.User;
 
 import java.time.LocalDateTime;
@@ -13,7 +14,7 @@ public record UserInfoResponseDto(
         String role,
         int coin,
         LocalDateTime createdAt,
-        LocalDateTime lastLoginAt
+        int currentStreak
 ) {
     public static UserInfoResponseDto from(User user) {
         return UserInfoResponseDto.builder()
@@ -23,7 +24,7 @@ public record UserInfoResponseDto(
                 .role(user.getUserRole().name())
                 .coin(user.getCoin())
                 .createdAt(user.getCreatedAt())
-                .lastLoginAt(user.getLastLoginAt())
+                .currentStreak(user.getStreak().getCurrent())
                 .build();
     }
 }
