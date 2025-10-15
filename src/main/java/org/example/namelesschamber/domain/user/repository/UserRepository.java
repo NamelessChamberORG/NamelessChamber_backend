@@ -16,4 +16,5 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
     long countByUserRoleAndCreatedAtBetween(UserRole role, LocalDateTime start, LocalDateTime end);
+    long countByUserRole(UserRole role);
 }

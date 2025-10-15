@@ -41,7 +41,7 @@ public class MetricsDiscordFormatter {
             - 오늘의 주제 : **%d개** (누적 %d개)
     
             👤 **회원 현황**
-            - 신규 회원가입 : **%d명**
+            - 신규 회원가입 : **%d명** (누적 %d명)
             - 익명 이용자 : **%d명**
             - 익명 대비 신규 회원 비율 : **%.1f%%**
             """.formatted(
@@ -52,6 +52,7 @@ public class MetricsDiscordFormatter {
                 metrics.todayPosts(),
                 metrics.todayTotalPosts(),
                 metrics.members(),
+                metrics.totalMembers(),
                 metrics.anonymous(),
                 ratio
         );

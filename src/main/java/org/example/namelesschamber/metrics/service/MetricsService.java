@@ -31,8 +31,8 @@ public class MetricsService {
         long todayTotalPosts = postRepository.countByType(PostType.TODAY);
         long members = userRepository.countByUserRoleAndCreatedAtBetween(UserRole.USER, start, end);
         long anonymous = userRepository.countByUserRoleAndCreatedAtBetween(UserRole.ANONYMOUS, start, end);
-
+        long totalMembers =  userRepository.countByUserRole(UserRole.USER);
         return new TodayMetricsDto(shortPosts,shortTotalPosts, longPosts, longTotalPosts,
-                todayPosts,todayTotalPosts, members, anonymous);
+                todayPosts,todayTotalPosts, members, anonymous,totalMembers);
     }
 }
