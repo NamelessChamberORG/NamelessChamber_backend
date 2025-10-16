@@ -19,7 +19,7 @@ public class CoinService {
 
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public int rewardForPost(String userId, int amount) {
         User user = findUserById(userId);
         user.addCoin(amount);
@@ -27,7 +27,7 @@ public class CoinService {
         return user.getCoin();
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void chargeForRead(String userId, int amount) {
         User user = findUserById(userId);
         user.decreaseCoin(amount);

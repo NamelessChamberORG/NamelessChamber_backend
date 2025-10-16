@@ -7,8 +7,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import static org.example.namelesschamber.common.util.TimeUtils.KST;
 
 @Document(collection = "users")
 @Getter
@@ -38,10 +41,17 @@ public class User {
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
+    @Field("streak")
+    @Builder.Default
+    private Streak streak = Streak.builder()
+            .current(1)
+            .best(1)
+            .lastSeenDate(LocalDate.now(KST).toString())
+            .todayMarked(true)
+            .build();
+
     @CreatedDate
     private LocalDateTime createdAt;
-
-    private LocalDateTime lastLoginAt;
 
     // 익명 로그인시 TTL 만료 정책을 위한 컬럼
     private LocalDateTime expiresAt;

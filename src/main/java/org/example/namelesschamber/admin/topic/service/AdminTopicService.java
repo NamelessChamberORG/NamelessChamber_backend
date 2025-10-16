@@ -14,7 +14,7 @@ public class AdminTopicService {
 
     private final TopicRepository topicRepository;
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void createTopic(TopicRequestDto dto) {
         Topic topic = Topic.builder()
                 .title(dto.title())

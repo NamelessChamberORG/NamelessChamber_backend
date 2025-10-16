@@ -40,7 +40,7 @@ public class AdminUserService {
         return AdminUserResponseDto.from(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void updateUserStatus(String id, AdminUserRequestDto request) {
         User user = userRepository.findByIdAndUserRole(id, UserRole.USER)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

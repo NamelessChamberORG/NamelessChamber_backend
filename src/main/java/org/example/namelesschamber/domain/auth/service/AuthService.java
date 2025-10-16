@@ -9,13 +9,15 @@ import org.example.namelesschamber.domain.auth.dto.request.LoginRequestDto;
 import org.example.namelesschamber.domain.auth.dto.request.ReissueRequestDto;
 import org.example.namelesschamber.domain.auth.dto.request.SignupRequestDto;
 import org.example.namelesschamber.domain.auth.dto.response.LoginResponseDto;
-import org.example.namelesschamber.domain.auth.jwt.JwtTokenProvider;
 import org.example.namelesschamber.domain.auth.entity.RefreshToken;
+import org.example.namelesschamber.domain.auth.jwt.JwtTokenProvider;
+import org.example.namelesschamber.domain.auth.repository.RefreshTokenRepository;
 import org.example.namelesschamber.domain.user.entity.User;
 import org.example.namelesschamber.domain.user.entity.UserRole;
 import org.example.namelesschamber.domain.user.entity.UserStatus;
-import org.example.namelesschamber.domain.auth.repository.RefreshTokenRepository;
 import org.example.namelesschamber.domain.user.repository.UserRepository;
+import org.example.namelesschamber.domain.user.service.StreakService;
+import org.example.namelesschamber.domain.visithistory.service.VisitHistoryService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,11 +34,13 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final EncoderUtils encoderUtils;
+    private final VisitHistoryService visitHistoryService;
+    private final StreakService streakService;
 
     @Value("${refresh.expiration}")
     private long refreshValidityInMs;
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto signup(SignupRequestDto request, String subject) {
 
         if (userRepository.existsByEmail(request.email())) {
@@ -58,6 +62,12 @@ public class AuthService {
             );
 
             userRepository.save(currentUser);
+            visitHistoryService.recordDailyVisit(currentUser.getId());
+            streakService.updateOnVisit(currentUser);
+
+            currentUser = userRepository.findById(currentUser.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
             return issueTokens(currentUser);
         }
 
@@ -69,10 +79,12 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+        visitHistoryService.recordDailyVisit(user.getId());
+
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -84,10 +96,18 @@ public class AuthService {
             throw new CustomException(ErrorCode.USER_NOT_ACTIVE);
         }
 
+        if (user.getUserRole() != UserRole.ANONYMOUS) {
+            visitHistoryService.recordDailyVisit(user.getId());
+            streakService.updateOnVisit(user);
+
+            user = userRepository.findById(user.getId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        }
+
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto loginAsAnonymous() {
         User user = User.builder()
                 .userRole(UserRole.ANONYMOUS)
@@ -98,7 +118,7 @@ public class AuthService {
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public LoginResponseDto reissueTokens(ReissueRequestDto request) {
         Claims claims = jwtTokenProvider.getClaimsEvenIfExpired(request.accessToken());
         String userId = claims.getSubject();
@@ -119,7 +139,7 @@ public class AuthService {
         return issueTokens(user);
     }
 
-    @Transactional
+    @Transactional("mongoTransactionManager")
     public void logout(String userId) {
         refreshTokenRepository.deleteByUserId(userId);
     }
