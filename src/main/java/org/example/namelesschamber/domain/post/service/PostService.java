@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
@@ -13,18 +14,25 @@ import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final ReadHistoryService readHistoryService;
     private final CoinService coinService;
+    private final MongoTemplate mongoTemplate;
+
 
     @Transactional(readOnly = true)
     public PostPreviewListResponse getPostPreviews(String userId) {
@@ -44,7 +52,6 @@ public class PostService {
         return PostPreviewListResponse.of(posts, coin);
     }
 
-    @Transactional("mongoTransactionManager")
     public PostCreateResponseDto createPost(PostCreateRequestDto request, String userId) {
         request.type().validateContentLength(request.content());
 
@@ -56,25 +63,44 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
-
-        int coinAfterCreate = coinService.rewardForPost(userId, 1);
-
-        return new PostCreateResponseDto(coinAfterCreate, post.getId());
+        try {
+            int coin = coinService.rewardForPost(userId, 1);
+            return new PostCreateResponseDto(coin, post.getId());
+        } catch (RuntimeException e) {
+            try {
+                postRepository.deleteById(post.getId());
+            } catch (RuntimeException ignore) {
+                log.error("Compensation(delete post) failed. postId={}, userId={}", post.getId(), userId, ignore);
+            }
+            throw e;
+        }
     }
 
-    @Transactional("mongoTransactionManager")
     public PostDetailResponseDto getPostById(String postId, String userId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        //성공하지 못한다면 이미 읽은 것으로 간주
-        if (readHistoryService.record(userId, postId)) {
-            coinService.chargeForRead(userId, 1);
+        boolean charged = coinService.chargeIfEnough(userId, 1);
+
+        if (!charged){
+            log.warn("User {} does not have enough coins to read post {}", userId, postId);
+            throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
         }
 
-        post.increaseViews();
-        postRepository.save(post);
+        boolean firstRead;
+        try {
+             firstRead = readHistoryService.record(userId, postId);
+        } catch (RuntimeException ex) {
+            coinService.refund(userId, 1);
+            throw ex;
+        }
+
+        if (firstRead) {
+            incrementViews(postId);
+        } else {
+            coinService.refund(userId, 1);
+        }
 
         int finalCoin = coinService.getCoin(userId);
 
@@ -88,4 +114,13 @@ public class PostService {
                 .map(PostPreviewResponseDto::from)
                 .toList();
     }
+
+    private void incrementViews(String postId) {
+        mongoTemplate.updateFirst(
+                Query.query(Criteria.where("_id").is(postId)),
+                new Update().inc("views", 1),
+                Post.class
+        );
+    }
+
 }

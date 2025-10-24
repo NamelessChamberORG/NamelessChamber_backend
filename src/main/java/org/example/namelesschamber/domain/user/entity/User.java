@@ -1,8 +1,6 @@
 package org.example.namelesschamber.domain.user.entity;
 
 import lombok.*;
-import org.example.namelesschamber.common.exception.CustomException;
-import org.example.namelesschamber.common.exception.ErrorCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -56,6 +54,7 @@ public class User {
     // 익명 로그인시 TTL 만료 정책을 위한 컬럼
     private LocalDateTime expiresAt;
 
+    /* CoinService의 원자 연산으로 변경
     public void addCoin(int amount) {
         this.coin += amount;
     }
@@ -66,6 +65,7 @@ public class User {
         }
         this.coin -= amount;
     }
+    */
     // 익명 -> 회원가입 시 업데이트
     public void updateToMember(String email, String passwordHash) {
         this.email = email;
