@@ -1,6 +1,7 @@
 package org.example.namelesschamber.metrics.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.user.entity.UserRole;
@@ -8,9 +9,9 @@ import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.example.namelesschamber.metrics.dto.TodayMetricsDto;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MetricsService {
@@ -19,9 +20,11 @@ public class MetricsService {
     private final UserRepository userRepository;
 
     public TodayMetricsDto getTodayMetrics() {
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.plusDays(1).atStartOfDay();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime utcNow = now.minusHours(9);
+
+        LocalDateTime start = utcNow.toLocalDate().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
 
         long shortPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.SHORT, start, end);
         long shortTotalPosts = postRepository.countByType(PostType.SHORT);
