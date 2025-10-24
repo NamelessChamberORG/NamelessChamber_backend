@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.user.entity.User;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CoinService {
     private final UserRepository userRepository;
@@ -28,7 +30,13 @@ public class CoinService {
         Update u = new Update().inc("coin", amount);
         FindAndModifyOptions opt = FindAndModifyOptions.options().returnNew(true);
         User after = mongoTemplate.findAndModify(q, u, opt, User.class);
-        if (after == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        if (after == null) {
+            log.warn("Reward failed: user not found (userId={})", userId);
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        log.info("Rewarded userId={} with +{} coins (new balance={})",
+                userId, amount, after.getCoin());
         return after.getCoin();
     }
 
