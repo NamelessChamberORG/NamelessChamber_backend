@@ -85,19 +85,18 @@ public class PostService {
         if (!charged) throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
 
 
+        boolean firstRead;
         try {
-            boolean firstRead = readHistoryService.record(userId, postId);
-            //처음 읽지 않았을경우
-            if (!firstRead) {
-                coinService.refund(userId, 1);
-
-            //처음 읽은 경우
-            } else {
-                incrementViews(postId);
-            }
+             firstRead = readHistoryService.record(userId, postId);
         } catch (RuntimeException ex) {
             coinService.refund(userId, 1);
             throw ex;
+        }
+
+        if (firstRead) {
+            incrementViews(postId);
+        } else {
+            coinService.refund(userId, 1);
         }
 
         int finalCoin = coinService.getCoin(userId);
