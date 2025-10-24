@@ -82,8 +82,11 @@ public class PostService {
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
         boolean charged = coinService.chargeIfEnough(userId, 1);
-        if (!charged) throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
 
+        if (!charged){
+            log.warn("User {} does not have enough coins to read post {}", userId, postId);
+            throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
+        }
 
         boolean firstRead;
         try {
