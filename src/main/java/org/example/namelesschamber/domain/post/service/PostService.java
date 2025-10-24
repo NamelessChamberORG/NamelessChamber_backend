@@ -1,6 +1,5 @@
 package org.example.namelesschamber.domain.post.service;
 
-import org.springframework.dao.DuplicateKeyException;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;

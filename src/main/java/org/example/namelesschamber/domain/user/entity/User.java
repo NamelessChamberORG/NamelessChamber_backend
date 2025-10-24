@@ -1,8 +1,6 @@
 package org.example.namelesschamber.domain.user.entity;
 
 import lombok.*;
-import org.example.namelesschamber.common.exception.CustomException;
-import org.example.namelesschamber.common.exception.ErrorCode;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
