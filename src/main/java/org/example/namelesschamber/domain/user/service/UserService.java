@@ -15,7 +15,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional("mongoTransactionManager")
     public void updateNickname(String userId, String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
@@ -28,7 +27,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    @Transactional(readOnly = true)
     public UserInfoResponseDto getMyInfo(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

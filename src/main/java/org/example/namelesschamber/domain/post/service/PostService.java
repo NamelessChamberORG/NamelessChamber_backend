@@ -1,5 +1,6 @@
 package org.example.namelesschamber.domain.post.service;
 
+import org.springframework.dao.DuplicateKeyException;
 import lombok.RequiredArgsConstructor;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
@@ -13,6 +14,10 @@ import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +30,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final ReadHistoryService readHistoryService;
     private final CoinService coinService;
+    private final MongoTemplate mongoTemplate;
+
 
     @Transactional(readOnly = true)
     public PostPreviewListResponse getPostPreviews(String userId) {
@@ -44,7 +51,6 @@ public class PostService {
         return PostPreviewListResponse.of(posts, coin);
     }
 
-    @Transactional("mongoTransactionManager")
     public PostCreateResponseDto createPost(PostCreateRequestDto request, String userId) {
         request.type().validateContentLength(request.content());
 
@@ -62,19 +68,24 @@ public class PostService {
         return new PostCreateResponseDto(coinAfterCreate, post.getId());
     }
 
-    @Transactional("mongoTransactionManager")
     public PostDetailResponseDto getPostById(String postId, String userId) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
-        //성공하지 못한다면 이미 읽은 것으로 간주
-        if (readHistoryService.record(userId, postId)) {
-            coinService.chargeForRead(userId, 1);
+        boolean charged = coinService.chargeIfEnough(userId, 1);
+        if (!charged) throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
+
+        try {
+            readHistoryService.record(userId, postId);
+        } catch (org.springframework.dao.DuplicateKeyException e) {
+            coinService.refund(userId, 1);
+        } catch (RuntimeException e) {
+            coinService.refund(userId, 1);              // 기타 실패에도 환불 보장
+            throw e;
         }
 
-        post.increaseViews();
-        postRepository.save(post);
+        incrementViews(postId);
 
         int finalCoin = coinService.getCoin(userId);
 
@@ -88,4 +99,13 @@ public class PostService {
                 .map(PostPreviewResponseDto::from)
                 .toList();
     }
+
+    private void incrementViews(String postId) {
+        mongoTemplate.updateFirst(
+                Query.query(Criteria.where("_id").is(postId)),
+                new Update().inc("views", 1),
+                Post.class
+        );
+    }
+
 }
