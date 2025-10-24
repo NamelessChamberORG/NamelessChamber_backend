@@ -1,6 +1,7 @@
 package org.example.namelesschamber.domain.post.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.common.exception.CustomException;
 import org.example.namelesschamber.common.exception.ErrorCode;
 import org.example.namelesschamber.domain.post.dto.request.PostCreateRequestDto;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PostService {
 
@@ -61,10 +63,17 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
-
-        int coinAfterCreate = coinService.rewardForPost(userId, 1);
-
-        return new PostCreateResponseDto(coinAfterCreate, post.getId());
+        try {
+            int coin = coinService.rewardForPost(userId, 1);
+            return new PostCreateResponseDto(coin, post.getId());
+        } catch (RuntimeException e) {
+            try {
+                postRepository.deleteById(post.getId());
+            } catch (RuntimeException ignore) {
+                log.error("Compensation(delete post) failed. postId={}, userId={}", post.getId(), userId, ignore);
+            }
+            throw e;
+        }
     }
 
     public PostDetailResponseDto getPostById(String postId, String userId) {
@@ -75,16 +84,21 @@ public class PostService {
         boolean charged = coinService.chargeIfEnough(userId, 1);
         if (!charged) throw new CustomException(ErrorCode.NOT_ENOUGH_COIN);
 
-        try {
-            readHistoryService.record(userId, postId);
-        } catch (org.springframework.dao.DuplicateKeyException e) {
-            coinService.refund(userId, 1);
-        } catch (RuntimeException e) {
-            coinService.refund(userId, 1);              // 기타 실패에도 환불 보장
-            throw e;
-        }
 
-        incrementViews(postId);
+        try {
+            boolean firstRead = readHistoryService.record(userId, postId);
+            //처음 읽지 않았을경우
+            if (!firstRead) {
+                coinService.refund(userId, 1);
+
+            //처음 읽은 경우
+            } else {
+                incrementViews(postId);
+            }
+        } catch (RuntimeException ex) {
+            coinService.refund(userId, 1);
+            throw ex;
+        }
 
         int finalCoin = coinService.getCoin(userId);
 
