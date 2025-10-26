@@ -2,7 +2,7 @@ package org.example.namelesschamber.domain.post.dto.response;
 
 import org.example.namelesschamber.domain.post.entity.Post;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record PostPreviewResponseDto(
         String postId,
@@ -12,7 +12,7 @@ public record PostPreviewResponseDto(
         int contentLength,
         long likes,
         long views,
-        LocalDateTime createdAt
+        Instant createdAt
 ) {
     private static final int PREVIEW_MAX_LENGTH = 100;
     private static final String ELLIPSIS = "...";
