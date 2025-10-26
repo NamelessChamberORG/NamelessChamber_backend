@@ -84,44 +84,52 @@ public class PostService {
     public PostCreateResponseDto createPost(PostCreateRequestDto request, String userId) {
         request.type().validateContentLength(request.content());
 
-        Post post = Post.builder()
+        Post post = postRepository.save(Post.builder()
                 .title(request.title())
                 .content(request.content())
                 .type(request.type())
                 .userId(userId)
-                .build();
+                .build());
 
-        postRepository.save(post);
-
+        // 코인 지급 보상 트랜잭션
+        int coin;
         try {
-            int coin = coinService.rewardForPost(userId, 1);
-            // 첫 글 여부 판독
-            boolean isFirstToday = markFirstWriteIfAbsent(userId);
-
-            int totalPosts = Math.toIntExact(postRepository.countByUserId(userId));
-
-            PostCreateResponseDto.WeeklyCalendarDto calendar = null;
-            if (isFirstToday) {
-                calendar = calendarService.computeThisWeek(userId);
-            }
-
-            return new PostCreateResponseDto(
-                    post.getId(),
-                    totalPosts,
-                    coin,
-                    isFirstToday,
-                    calendar
-            );
-
-        } catch (RuntimeException e) {
-            //실패 시 보상 처리
+            coin = coinService.rewardForPost(userId, 1);
+        } catch (RuntimeException ex) {
             try {
-                postRepository.deleteById(post.getId()); }
-            catch (RuntimeException ignore) {
-                log.error("Compensation(delete post) failed. postId={}, userId={}", post.getId(), userId, ignore);
+                postRepository.deleteById(post.getId());
+            } catch (RuntimeException cleanupEx) {
+                log.error("Compensation(delete post) failed. postId={}, userId={}", post.getId(), userId, cleanupEx);
             }
-            throw e;
+            throw ex;
         }
+
+        boolean isFirstToday;
+        try {
+            isFirstToday = markFirstWriteIfAbsent(userId);
+        } catch (RuntimeException ignore) {
+            isFirstToday = false;
+        }
+
+        int totalPosts = Math.toIntExact(postRepository.countByUserId(userId));
+
+        PostCreateResponseDto.WeeklyCalendarDto calendar = null;
+
+        if (isFirstToday) {
+            try {
+                calendar = calendarService.computeThisWeek(userId);
+            } catch (RuntimeException ex) {
+                log.error("Weekly calendar compute failed. userId={}, postId={}", userId, post.getId(), ex);
+            }
+        }
+
+        return new PostCreateResponseDto(
+                post.getId(),
+                totalPosts,
+                coin,
+                isFirstToday,
+                calendar
+        );
     }
 
     /** 오늘 첫 글 게이트 유니크 업서트. 최초만 true */
@@ -134,7 +142,7 @@ public class PostService {
         Update u = new Update()
                 .setOnInsert("user_id", userId)
                 .setOnInsert("day_start", Date.from(dayStartUtc))
-                .setOnInsert("created_at", new Date());
+                .setOnInsert("created_at", Date.from(Instant.now()));
 
         FindAndModifyOptions opt = FindAndModifyOptions.options().upsert(true).returnNew(false);
         Document before = mongoTemplate.findAndModify(q, u, opt, Document.class, "first_write_gate");
