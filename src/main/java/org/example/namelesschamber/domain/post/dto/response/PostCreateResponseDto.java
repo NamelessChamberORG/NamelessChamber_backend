@@ -11,14 +11,6 @@ public record PostCreateResponseDto(
         WeeklyCalendarDto calendar
 ) {
 
-    public static PostCreateResponseDto firstOf(String postId, int totalPosts, int coin, WeeklyCalendarDto calendar) {
-        return new PostCreateResponseDto(postId, totalPosts, coin, true, calendar);
-    }
-
-    public static PostCreateResponseDto nonFirstOf(String postId, int totalPosts, int coin) {
-        return new PostCreateResponseDto(postId, totalPosts, coin, false, null);
-    }
-
     public record WeeklyCalendarDto(
             LocalDate weekStart,
             List<Boolean> days,

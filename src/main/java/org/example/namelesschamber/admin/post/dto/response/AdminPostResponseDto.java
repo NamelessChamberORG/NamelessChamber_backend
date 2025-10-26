@@ -4,7 +4,6 @@ import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 public record AdminPostResponseDto(
         String id,

@@ -42,10 +42,6 @@ public class Post {
     @CreatedDate
     private Instant createdAt;
 
-    public void increaseViews() {
-        this.views += 1;
-    }
-
     public void updateByAdmin(String title, String content) {
         this.title = title;
         this.content = content;
