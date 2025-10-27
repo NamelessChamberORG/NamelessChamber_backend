@@ -37,6 +37,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final ZoneId KST = ZoneId.of("Asia/Seoul");
+
     private final PostRepository postRepository;
     private final ReadHistoryService readHistoryService;
     private final CoinService coinService;
@@ -107,7 +109,8 @@ public class PostService {
         boolean isFirstToday;
         try {
             isFirstToday = markFirstWriteIfAbsent(userId);
-        } catch (RuntimeException ignore) {
+        } catch (RuntimeException ex) {
+            log.error("Failed to mark first write for user {}", userId, ex);
             isFirstToday = false;
         }
 
@@ -134,15 +137,14 @@ public class PostService {
 
     /** 오늘 첫 글 게이트 유니크 업서트. 최초만 true */
     private boolean markFirstWriteIfAbsent(String userId) {
-        ZoneId KST = ZoneId.of("Asia/Seoul");
         Instant dayStartUtc = LocalDate.now(KST).atStartOfDay(KST).toInstant();
 
         Query q = Query.query(Criteria.where("user_id").is(userId)
-                .and("day_start").is(Date.from(dayStartUtc)));
+                .and("day_start").is(dayStartUtc));
         Update u = new Update()
                 .setOnInsert("user_id", userId)
-                .setOnInsert("day_start", Date.from(dayStartUtc))
-                .setOnInsert("created_at", Date.from(Instant.now()));
+                .setOnInsert("day_start", dayStartUtc)
+                .setOnInsert("created_at", Instant.now());
 
         FindAndModifyOptions opt = FindAndModifyOptions.options().upsert(true).returnNew(false);
         Document before = mongoTemplate.findAndModify(q, u, opt, Document.class, "first_write_gate");
