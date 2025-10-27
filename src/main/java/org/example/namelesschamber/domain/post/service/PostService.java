@@ -10,26 +10,23 @@ import org.example.namelesschamber.domain.post.dto.response.PostCreateResponseDt
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewListResponse;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
+import org.example.namelesschamber.domain.post.entity.FirstWriteGate;
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.bson.Document;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -44,26 +41,6 @@ public class PostService {
     private final CoinService coinService;
     private final CalendarService calendarService;
     private final MongoTemplate mongoTemplate;
-
-    @PostConstruct
-    void ensureIndexes() {
-        // 유니크 인덱스: (user_id, day_start) 하루 한 번만 통과
-        mongoTemplate.indexOps("first_write_gate")
-                .ensureIndex(new Index()
-                        .on("user_id", Sort.Direction.ASC)
-                        .on("day_start", Sort.Direction.ASC)
-                        .unique()
-                        .named("uniq_user_day"));
-
-        //TTL 인덱스(2일 후 자동 삭제)
-        mongoTemplate.indexOps("first_write_gate")
-                .ensureIndex(new Index()
-                        .on("created_at", Sort.Direction.ASC)
-                        .expire(172800)
-                        .named("ttl_cleanup_2d"));
-    }
-
-
 
     @Transactional(readOnly = true)
     public PostPreviewListResponse getPostPreviews(String userId) {
@@ -110,7 +87,7 @@ public class PostService {
         try {
             isFirstToday = markFirstWriteIfAbsent(userId);
         } catch (RuntimeException ex) {
-            log.error("Failed to mark first write for user {}", userId, ex);
+            log.warn("Failed to mark first write for user {}", userId, ex);
             isFirstToday = false;
         }
 
@@ -122,7 +99,7 @@ public class PostService {
             try {
                 calendar = calendarService.computeThisWeek(userId);
             } catch (RuntimeException ex) {
-                log.error("Weekly calendar compute failed. userId={}, postId={}", userId, post.getId(), ex);
+                log.warn("Weekly calendar compute failed. userId={}, postId={}", userId, post.getId(), ex);
             }
         }
 
@@ -139,16 +116,22 @@ public class PostService {
     private boolean markFirstWriteIfAbsent(String userId) {
         Instant dayStartUtc = LocalDate.now(KST).atStartOfDay(KST).toInstant();
 
-        Query q = Query.query(Criteria.where("user_id").is(userId)
-                .and("day_start").is(dayStartUtc));
-        Update u = new Update()
-                .setOnInsert("user_id", userId)
-                .setOnInsert("day_start", dayStartUtc)
-                .setOnInsert("created_at", Instant.now());
+        Query q = Query.query(
+                Criteria.where("userId").is(userId)
+                        .and("dayStart").is(dayStartUtc)
+        );
 
-        FindAndModifyOptions opt = FindAndModifyOptions.options().upsert(true).returnNew(false);
-        Document before = mongoTemplate.findAndModify(q, u, opt, Document.class, "first_write_gate");
-        return (before == null); // 문서가 새로 생성된 경우만 true
+        Update u = new Update()
+                .setOnInsert("userId", userId)
+                .setOnInsert("dayStart", dayStartUtc)
+                .setOnInsert("createdAt", Instant.now());
+
+        FindAndModifyOptions opt = FindAndModifyOptions.options()
+                .upsert(true)
+                .returnNew(false);
+
+        FirstWriteGate before = mongoTemplate.findAndModify(q, u, opt, FirstWriteGate.class);
+        return (before == null);
     }
 
     public PostDetailResponseDto getPostById(String postId, String userId) {
