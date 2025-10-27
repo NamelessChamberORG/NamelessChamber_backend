@@ -9,22 +9,25 @@ import org.example.namelesschamber.domain.user.repository.UserRepository;
 import org.example.namelesschamber.metrics.dto.TodayMetricsDto;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MetricsService {
 
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
     public TodayMetricsDto getTodayMetrics() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime utcNow = now.minusHours(9);
-
-        LocalDateTime start = utcNow.toLocalDate().atStartOfDay();
-        LocalDateTime end = start.plusDays(1);
+        LocalDate todayKst = LocalDate.now(KST);
+        Instant start = todayKst.atStartOfDay(KST).toInstant();
+        Instant end   = todayKst.plusDays(1).atStartOfDay(KST).toInstant();
 
         long shortPosts = postRepository.countByTypeAndCreatedAtBetween(PostType.SHORT, start, end);
         long shortTotalPosts = postRepository.countByType(PostType.SHORT);

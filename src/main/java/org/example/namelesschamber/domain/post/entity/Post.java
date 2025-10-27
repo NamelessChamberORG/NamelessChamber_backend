@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Document(collection = "posts")
 @Getter
@@ -40,11 +40,7 @@ public class Post {
     private long likes = 0L;
 
     @CreatedDate
-    private LocalDateTime createdAt;
-
-    public void increaseViews() {
-        this.views += 1;
-    }
+    private Instant createdAt;
 
     public void updateByAdmin(String title, String content) {
         this.title = title;
@@ -54,6 +50,3 @@ public class Post {
         this.isDeleted = true;
     }
 }
-
-
-

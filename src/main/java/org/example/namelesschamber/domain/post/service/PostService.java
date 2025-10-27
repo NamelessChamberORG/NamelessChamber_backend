@@ -1,5 +1,6 @@
 package org.example.namelesschamber.domain.post.service;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.namelesschamber.common.exception.CustomException;
@@ -9,11 +10,13 @@ import org.example.namelesschamber.domain.post.dto.response.PostCreateResponseDt
 import org.example.namelesschamber.domain.post.dto.response.PostDetailResponseDto;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewListResponse;
 import org.example.namelesschamber.domain.post.dto.response.PostPreviewResponseDto;
+import org.example.namelesschamber.domain.post.entity.FirstWriteGate;
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 import org.example.namelesschamber.domain.post.repository.PostRepository;
 import org.example.namelesschamber.domain.readhistory.service.ReadHistoryService;
 import org.example.namelesschamber.domain.user.service.CoinService;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -21,6 +24,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -28,11 +34,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final ZoneId KST = ZoneId.of("Asia/Seoul");
+
     private final PostRepository postRepository;
     private final ReadHistoryService readHistoryService;
     private final CoinService coinService;
+    private final CalendarService calendarService;
     private final MongoTemplate mongoTemplate;
-
 
     @Transactional(readOnly = true)
     public PostPreviewListResponse getPostPreviews(String userId) {
@@ -55,25 +63,75 @@ public class PostService {
     public PostCreateResponseDto createPost(PostCreateRequestDto request, String userId) {
         request.type().validateContentLength(request.content());
 
-        Post post = Post.builder()
+        Post post = postRepository.save(Post.builder()
                 .title(request.title())
                 .content(request.content())
                 .type(request.type())
                 .userId(userId)
-                .build();
+                .build());
 
-        postRepository.save(post);
+        // 코인 지급 보상 트랜잭션
+        int coin;
         try {
-            int coin = coinService.rewardForPost(userId, 1);
-            return new PostCreateResponseDto(coin, post.getId());
-        } catch (RuntimeException e) {
+            coin = coinService.rewardForPost(userId, 1);
+        } catch (RuntimeException ex) {
             try {
                 postRepository.deleteById(post.getId());
-            } catch (RuntimeException ignore) {
-                log.error("Compensation(delete post) failed. postId={}, userId={}", post.getId(), userId, ignore);
+            } catch (RuntimeException cleanupEx) {
+                log.error("Compensation(delete post) failed. postId={}, userId={}", post.getId(), userId, cleanupEx);
             }
-            throw e;
+            throw ex;
         }
+
+        boolean isFirstToday;
+        try {
+            isFirstToday = markFirstWriteIfAbsent(userId);
+        } catch (RuntimeException ex) {
+            log.warn("Failed to mark first write for user {}", userId, ex);
+            isFirstToday = false;
+        }
+
+        int totalPosts = Math.toIntExact(postRepository.countByUserId(userId));
+
+        PostCreateResponseDto.WeeklyCalendarDto calendar = null;
+
+        if (isFirstToday) {
+            try {
+                calendar = calendarService.computeThisWeek(userId);
+            } catch (RuntimeException ex) {
+                log.warn("Weekly calendar compute failed. userId={}, postId={}", userId, post.getId(), ex);
+            }
+        }
+
+        return new PostCreateResponseDto(
+                post.getId(),
+                totalPosts,
+                coin,
+                isFirstToday,
+                calendar
+        );
+    }
+
+    /** 오늘 첫 글 게이트 유니크 업서트. 최초만 true */
+    private boolean markFirstWriteIfAbsent(String userId) {
+        Instant dayStartUtc = LocalDate.now(KST).atStartOfDay(KST).toInstant();
+
+        Query q = Query.query(
+                Criteria.where("userId").is(userId)
+                        .and("dayStart").is(dayStartUtc)
+        );
+
+        Update u = new Update()
+                .setOnInsert("userId", userId)
+                .setOnInsert("dayStart", dayStartUtc)
+                .setOnInsert("createdAt", Instant.now());
+
+        FindAndModifyOptions opt = FindAndModifyOptions.options()
+                .upsert(true)
+                .returnNew(false);
+
+        FirstWriteGate before = mongoTemplate.findAndModify(q, u, opt, FirstWriteGate.class);
+        return (before == null);
     }
 
     public PostDetailResponseDto getPostById(String postId, String userId) {

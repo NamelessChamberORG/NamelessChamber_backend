@@ -3,7 +3,7 @@ package org.example.namelesschamber.admin.post.dto.response;
 import org.example.namelesschamber.domain.post.entity.Post;
 import org.example.namelesschamber.domain.post.entity.PostType;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record AdminPostResponseDto(
         String id,
@@ -14,7 +14,7 @@ public record AdminPostResponseDto(
         boolean isDeleted,
         long views,
         long likes,
-        LocalDateTime createdAt
+        Instant createdAt
 ) {
     public static AdminPostResponseDto from(Post post) {
         return new AdminPostResponseDto(
