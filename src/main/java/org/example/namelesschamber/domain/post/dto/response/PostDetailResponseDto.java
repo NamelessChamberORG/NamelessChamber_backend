@@ -2,7 +2,7 @@ package org.example.namelesschamber.domain.post.dto.response;
 
 import org.example.namelesschamber.domain.post.entity.Post;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record PostDetailResponseDto(
         String postId,
@@ -10,7 +10,7 @@ public record PostDetailResponseDto(
         String content,
         long likes,
         long views,
-        LocalDateTime createdAt,
+        Instant createdAt,
         int coin
 ) {
     public static PostDetailResponseDto from(Post post, int coin) {
