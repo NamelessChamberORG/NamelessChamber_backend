@@ -33,7 +33,7 @@ public class CalendarService {
                         gte(fromUtc).lt(toUtc)
         );
 
-        List<Post> posts = mongoTemplate.find(q, Post.class, "posts");
+        List<Post> posts = mongoTemplate.find(q, Post.class);
 
         int[] counts = new int[7];
 
